@@ -41731,6 +41731,7 @@ var Main = function (_Component) {
 
         _this.handleAddProduct = _this.handleAddProduct.bind(_this);
         _this.handleDeleteProduct = _this.handleDeleteProduct.bind(_this);
+        _this.handleDeleteConfirm = _this.handleDeleteConfirm.bind(_this);
         return _this;
     }
 
@@ -41814,6 +41815,13 @@ var Main = function (_Component) {
             });
         }
     }, {
+        key: 'handleDeleteConfirm',
+        value: function handleDeleteConfirm(event) {
+            if (confirm("Are you sure you want to delete it?")) {
+                this.handleDeleteProduct();
+            }
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _divStyle;
@@ -41852,7 +41860,8 @@ var Main = function (_Component) {
                     ),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__Product__["a" /* default */], {
                         product: this.state.currentProduct,
-                        handleDeleteProduct: this.handleDeleteProduct
+                        deleteProduct: this.handleDeleteProduct,
+                        handleDeleteConfirm: this.handleDeleteConfirm
                     }),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__AddProduct__["a" /* default */], { onAdd: this.handleAddProduct })
                 )
@@ -54864,7 +54873,8 @@ module.exports = ReactDOMInvalidARIAHook;
 
 var Product = function Product(props) {
   var product = props.product,
-      handleDeleteProduct = props.handleDeleteProduct;
+      handleDeleteProduct = props.handleDeleteProduct,
+      handleDeleteConfirm = props.handleDeleteConfirm;
 
 
   var divStyle = {
@@ -54915,7 +54925,7 @@ var Product = function Product(props) {
       type: 'button',
       value: 'Delete',
       onClick: function onClick(e) {
-        return handleDeleteProduct();
+        return handleDeleteConfirm();
       }
     })
   );

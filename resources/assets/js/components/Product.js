@@ -3,7 +3,8 @@ import React from 'react';
 const Product = props => {
   const {
     product,
-    handleDeleteProduct
+    handleDeleteProduct,
+    handleDeleteConfirm
   } = props;
 
   const divStyle = {
@@ -30,7 +31,7 @@ const Product = props => {
       <input 
         type="button"
         value="Delete"
-        onClick={e => handleDeleteProduct()}
+        onClick={e => handleDeleteConfirm()}
       />
     </div>
   )

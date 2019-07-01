@@ -14,6 +14,7 @@ class Main extends Component {
 
         this.handleAddProduct = this.handleAddProduct.bind(this);
         this.handleDeleteProduct = this.handleDeleteProduct.bind(this);
+        this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
     }
 
     componentDidMount() {
@@ -83,6 +84,12 @@ class Main extends Component {
             this.setState({ products: newProducts, currentProduct: null });
         });
     }
+
+    handleDeleteConfirm(event) {
+        if (confirm("Are you sure you want to delete it?")) {
+            this.handleDeleteProduct();
+        }
+    }
     
     render() {
         const mainDivStyle =  {
@@ -110,7 +117,8 @@ class Main extends Component {
                     </div>
                     <Product 
                         product={this.state.currentProduct} 
-                        handleDeleteProduct={this.handleDeleteProduct}
+                        deleteProduct={this.handleDeleteProduct}
+                        handleDeleteConfirm={this.handleDeleteConfirm}
                     />
                     <AddProduct onAdd={this.handleAddProduct} /> 
                 </div>
