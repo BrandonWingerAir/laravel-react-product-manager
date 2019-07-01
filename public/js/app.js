@@ -41728,7 +41728,9 @@ var Main = function (_Component) {
             products: [],
             currentProduct: null
         };
+
         _this.handleAddProduct = _this.handleAddProduct.bind(_this);
+        _this.handleDeleteProduct = _this.handleDeleteProduct.bind(_this);
         return _this;
     }
 
@@ -41795,6 +41797,23 @@ var Main = function (_Component) {
             });
         }
     }, {
+        key: 'handleDeleteProduct',
+        value: function handleDeleteProduct() {
+            var _this5 = this;
+
+            var currentProduct = this.state.currentProduct;
+
+            fetch("api/products/" + this.state.currentProduct.id, {
+                method: "delete"
+            }).then(function (response) {
+                var newProducts = _this5.state.products.filter(function (item) {
+                    return item !== currentProduct;
+                });
+
+                _this5.setState({ products: newProducts, currentProduct: null });
+            });
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _divStyle;
@@ -41823,7 +41842,7 @@ var Main = function (_Component) {
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'h3',
                             null,
-                            ' All products '
+                            'All products'
                         ),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'ul',
@@ -41831,7 +41850,10 @@ var Main = function (_Component) {
                             this.renderProducts()
                         )
                     ),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__Product__["a" /* default */], { product: this.state.currentProduct }),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__Product__["a" /* default */], {
+                        product: this.state.currentProduct,
+                        handleDeleteProduct: this.handleDeleteProduct
+                    }),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__AddProduct__["a" /* default */], { onAdd: this.handleAddProduct })
                 )
             );
@@ -54840,8 +54862,10 @@ module.exports = ReactDOMInvalidARIAHook;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 
 
-var Product = function Product(_ref) {
-  var product = _ref.product;
+var Product = function Product(props) {
+  var product = props.product,
+      handleDeleteProduct = props.handleDeleteProduct;
+
 
   var divStyle = {
     display: 'flex',
@@ -54878,15 +54902,22 @@ var Product = function Product(_ref) {
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'h3',
       null,
-      'Status ',
+      'Status: ',
       product.availability ? 'Available' : 'Out of stock'
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'h3',
       null,
-      'Price : ',
+      'Price: ',
       product.price
-    )
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
+      type: 'button',
+      value: 'Delete',
+      onClick: function onClick(e) {
+        return handleDeleteProduct();
+      }
+    })
   );
 };
 

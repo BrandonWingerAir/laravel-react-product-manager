@@ -6,11 +6,14 @@ import AddProduct from './AddProduct';
 class Main extends Component {
     constructor() {
         super();
+
         this.state = {
             products: [],
             currentProduct: null
         }
+
         this.handleAddProduct = this.handleAddProduct.bind(this);
+        this.handleDeleteProduct = this.handleDeleteProduct.bind(this);
     }
 
     componentDidMount() {
@@ -64,7 +67,22 @@ class Main extends Component {
                 currentProduct : data
             }));
         });
-    }  
+    }
+
+    handleDeleteProduct() {
+        const currentProduct = this.state.currentProduct;
+
+        fetch("api/products/" + this.state.currentProduct.id, {
+            method: "delete"
+        })
+        .then(response => {
+            var newProducts = this.state.products.filter(function(item) {
+                return item !== currentProduct;
+            });
+    
+            this.setState({ products: newProducts, currentProduct: null });
+        });
+    }
     
     render() {
         const mainDivStyle =  {
@@ -83,16 +101,19 @@ class Main extends Component {
 
         return (
             <div>
-            <div style= {mainDivStyle}>
-                <div style={divStyle}>
-                    <h3> All products </h3>
-                    <ul>
-                        { this.renderProducts() }
-                    </ul> 
-                </div> 
-                    <Product product={this.state.currentProduct} />
+                <div style= {mainDivStyle}>
+                    <div style={divStyle}>
+                        <h3>All products</h3>
+                        <ul>
+                            { this.renderProducts() }
+                        </ul> 
+                    </div>
+                    <Product 
+                        product={this.state.currentProduct} 
+                        handleDeleteProduct={this.handleDeleteProduct}
+                    />
                     <AddProduct onAdd={this.handleAddProduct} /> 
-            </div>
+                </div>
             </div>
         );
     }

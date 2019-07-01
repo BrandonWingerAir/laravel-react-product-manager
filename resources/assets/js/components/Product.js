@@ -1,6 +1,11 @@
 import React from 'react';
 
-const Product = ({product}) => {
+const Product = props => {
+  const {
+    product,
+    handleDeleteProduct
+  } = props;
+
   const divStyle = {
       display: 'flex',
       flexDirection: 'column',
@@ -20,8 +25,13 @@ const Product = ({product}) => {
     <div style={divStyle}> 
       <h2>{product.title}</h2>
       <p>{product.description}</p>
-      <h3>Status {product.availability ? 'Available' : 'Out of stock'}</h3>
-      <h3>Price : {product.price}</h3>
+      <h3>Status: {product.availability ? 'Available' : 'Out of stock'}</h3>
+      <h3>Price: {product.price}</h3>
+      <input 
+        type="button"
+        value="Delete"
+        onClick={e => handleDeleteProduct()}
+      />
     </div>
   )
 }
