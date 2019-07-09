@@ -8,7 +8,7 @@ class AddProduct extends Component {
             title: '',
             description: '',
             price: 0,
-            availability: 0
+            availability: 1
         }
       }
     
@@ -29,37 +29,47 @@ class AddProduct extends Component {
 
   render() {
     const divStyle = {
-      position: 'absolute',
-      left: '35%',
-      top: '60%',
+      position: 'inline-block',
+      marginTop: '30px',
       flexDirection: 'space-between',
-      marginLeft: '30px'
+      marginLeft: '30px',
+      width: '40vw'
     }
     
-    const inputStyle = {
-      margin: '0px 10px'
+    const createPriceStyle = {
+      width: '30%'
     }
+
     return(
       <div> 
+        <hr/>
         <div style={divStyle}> 
-          <h2> Add new product </h2>
+          <h2>New Product</h2>
           <form onSubmit={this.handleSubmit}>
-            <label> 
-              Title: 
-              <input style={inputStyle} type="text" onChange={(e)=>this.handleInput('title',e)} />
-            </label>
+            <div className="form-group">
+              <label>Title:</label>
+              <input className="form-control" type="text" onChange={(e)=>this.handleInput('title', e)} required/>
+            </div>
             
-            <label> 
-              Description: 
-              <input style={inputStyle}  type="text" onChange={(e)=>this.handleInput('description',e)} />
-            </label>
+            <div className="form-group">
+              <label>Description:</label>
+              <textarea className="form-control" type="text" onChange={(e)=>this.handleInput('description', e)}></textarea>
+            </div>
             
-            <label>
-              Price:
-              <input style={inputStyle}  type="number" onChange={(e)=>this.handleInput('price', e)}/>
-            </label>
+            <div className="form-group" style={createPriceStyle}>
+              <label>Price:</label>
+              <input className="form-control" type="number" onChange={(e)=>this.handleInput('price', e)}/>
+            </div>
 
-            <input style={inputStyle}  type="submit" value="Submit" />
+            <div className="form-group" style={createPriceStyle}>
+              <label>Availability:</label>
+              <select className="form-control" type="number" onChange={(e)=>this.handleInput('availability', e)}>
+                <option value="1">Available</option>
+                <option value="0">Out of stock</option>
+              </select>
+            </div>
+
+            <input className="btn btn-primary" type="submit" value="Submit"/>
           </form>
         </div>
       </div>

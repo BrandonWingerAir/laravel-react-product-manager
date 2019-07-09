@@ -15,11 +15,11 @@ class ProductsTableSeeder extends Seeder
         $faker = \Faker\Factory::create();
         \Bezhanov\Faker\ProviderCollectionHelper::addAllProvidersTo($faker);
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             Product::create([
-                'title' => $faker->deviceModelName,
-                'description' => $faker->paragraph,
-                'price' => $faker->randomNumber(2),
+                'title' => $faker->unique()->devicePlatform,
+                'description' => $faker->unique()->ean8,
+                'price' => $faker->randomNumber(3, true),
                 'availability' => $faker->boolean(50)
             ]);
         }

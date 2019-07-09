@@ -10,6 +10,7 @@
     </head>
     <body>
         <h1 style="text-align: center">Product Manager</h1>
+        <hr>
         <div id="root"></div>
 
         <script src="{{mix('js/app.js')}}" ></script>

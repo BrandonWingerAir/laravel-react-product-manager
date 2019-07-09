@@ -7,3 +7,25 @@
 
 // Bootstrap
 @import "~bootstrap-sass/assets/stylesheets/bootstrap";
+
+ul {
+  padding-left: 0;
+}
+
+li:hover {
+  background-color: rgba($color: #000000, $alpha: 0.1);
+  cursor: pointer;
+}
+
+p {
+  word-wrap: break-word;
+}
+
+input[type="button"] {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+input[type="submit"] {
+  margin: 10px 0 20px;
+}
