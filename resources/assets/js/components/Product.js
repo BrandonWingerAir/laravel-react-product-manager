@@ -10,7 +10,9 @@ const Product = props => {
   } = props;
 
   const divStyle = {
-    width: '60vw',
+    display: 'inline-block',
+    float: 'left',
+    width: '40vw',
     margin: '30px 10px 15px 30px',
   }
 

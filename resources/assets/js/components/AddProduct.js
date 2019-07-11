@@ -28,6 +28,11 @@ class AddProduct extends Component {
   }
 
   render() {
+    const mainDivStyle = {
+      display: 'inline-block',
+      width: '40vw'
+    }
+
     const divStyle = {
       position: 'inline-block',
       marginTop: '30px',
@@ -41,7 +46,7 @@ class AddProduct extends Component {
     }
 
     return(
-      <div> 
+      <div style={mainDivStyle}> 
         <hr/>
         <div style={divStyle}> 
           <h2>New Product</h2>
