@@ -6,7 +6,8 @@ const Product = props => {
     handleEdit,
     update,
     deleteProduct,
-    handleDeleteConfirm
+    handleDeleteConfirm,
+    token
   } = props;
 
   const divStyle = {
@@ -30,8 +31,14 @@ const Product = props => {
       <p>{product.description}</p>
       <h3>Status: {product.availability ? 'Available' : 'Out of stock'}</h3>
       <h3>Price: ${product.price}</h3>
-      <input className="btn btn-info" type="button" value="Edit" onClick={e => handleEdit()}/>
-      <input className="btn btn-danger" type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
+      { token === true ? (
+        <div>
+          <input className="btn btn-info" type="button" value="Edit" onClick={e => handleEdit()}/>
+          <input className="btn btn-danger" type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
+        </div>
+      ) : (
+        <div>Login to add a review.</div>
+      )}
     </div>
   )
 }

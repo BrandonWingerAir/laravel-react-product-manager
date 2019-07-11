@@ -20,15 +20,16 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('products', 'ProductsController@index');
 Route::get('products/{product}', 'ProductsController@show');
-Route::post('products', 'ProductsController@store');
-Route::put('products/{product}', 'ProductsController@update');
-Route::delete('products/{product}', 'ProductsController@delete');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
   return $request->user();
 });
 
 Route::group(['middleware' => ['jwt.auth', 'api-header']], function() {
+  Route::post('products', 'ProductsController@store');
+  Route::put('products/{product}', 'ProductsController@update');
+  Route::delete('products/{product}', 'ProductsController@delete');
+
   Route::get('user/home', function() {
       $user = Auth::user();
       $response = ['success' => true, 'data' => $user];

@@ -20,7 +20,10 @@ export default class Main extends Component {
             currentProduct: null,
             editBtnClicked: false,
             isLoggedIn: false,
-            user: {}
+            user: {},
+            token: localStorage["appState"]
+                ? JSON.parse(localStorage["appState"]).user.auth_token
+                : ""
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this);
@@ -40,7 +43,7 @@ export default class Main extends Component {
         })
         .then(products => {
             this.setState({ products });
-        });
+        })
 
         let state = localStorage["appState"];
 
@@ -80,7 +83,7 @@ export default class Main extends Component {
     handleAddProduct(product) {
         product.price = Number(product.price);
 
-        fetch( 'api/products/', {
+        fetch( `api/products?token=${this.state.token}`, {
             method:'post',
             headers: {
                 'Accept': 'application/json',
@@ -102,7 +105,7 @@ export default class Main extends Component {
     handleDeleteProduct() {
         const currentProduct = this.state.currentProduct;
 
-        fetch("api/products/" + currentProduct.id, {
+        fetch(`api/products/${currentProduct.id}?token=${this.state.token}`, {
             method: "delete"
         })
         .then(response => {
@@ -127,11 +130,11 @@ export default class Main extends Component {
     handleUpdate(product) {
         const currentProduct = this.state.currentProduct;
 
-        fetch( 'api/products/'+ currentProduct.id, {
+        fetch( `api/products/${currentProduct.id}?token=${this.state.token}`, {
             method:'put',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(product)
         })
@@ -144,7 +147,7 @@ export default class Main extends Component {
                     productObj => (productObj.id === currentProduct.id) ?
                     Object.assign(productObj, product) : productObj
                 )
-            }));            
+            }));
         });
 
         this.setState({ editBtnClicked: false });
@@ -321,6 +324,13 @@ export default class Main extends Component {
                             { this.renderProducts() }
                         </ul>
                     </div>
+                    <Product 
+                        product = {this.state.currentProduct} 
+                        deleteProduct = {this.handleDeleteProduct}
+                        handleDeleteConfirm = {this.handleDeleteConfirm}
+                        handleEdit = {this.handleEdit}
+                        token = {this.state.token}
+                    />
                     <Switch data="data">
                         <Route
                             path="/login"
@@ -340,12 +350,6 @@ export default class Main extends Component {
                                     />
                                 ) : (
                                     <div style={loggedInStyle}>
-                                        <Product 
-                                            product={this.state.currentProduct} 
-                                            deleteProduct={this.handleDeleteProduct}
-                                            handleDeleteConfirm={this.handleDeleteConfirm}
-                                            handleEdit={this.handleEdit}
-                                        />
                                         <Home
                                             {...props}
                                             logoutUser={this._logoutUser}
