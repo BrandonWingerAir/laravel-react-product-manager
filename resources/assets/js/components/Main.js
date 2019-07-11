@@ -223,13 +223,14 @@ export default class Main extends Component {
             
             return response;
         })
-        .then(json => {
-            if (json.data.success) {
+        .then(json => {  
+            console.log(json);
+            if (json.data[0].success) {
                 let userData = {
-                    name: json.data.data.name,
-                    id: json.data.data.id,
-                    email: json.data.data.email,
-                    auth_token: json.data.data.auth_token,
+                    name: json.data[0].data.name,
+                    id: json.data[0].data.id,
+                    email: json.data[0].data.email,
+                    auth_token: json.data[0].data.auth_token,
                     timestamp: new Date().toString()
                 };
 
@@ -315,7 +316,7 @@ export default class Main extends Component {
             <div>
                 <div style={mainDivStyle}>
                     <div style={divStyle}>
-                        <h3>All products ({this.state.products.length})</h3>
+                        <h3>All reviews ({this.state.products.length})</h3>
                         <ul>
                             { this.renderProducts() }
                         </ul>

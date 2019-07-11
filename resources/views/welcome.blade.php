@@ -9,7 +9,7 @@
         <link href="{{mix('css/app.css')}}" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <h1 class="text-center">Product Manager</h1>
+        <h1 class="text-center">Electronic Reviews</h1>
         <hr>
         <div id="root"></div>
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,10 +29,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware' => ['jwt.auth', 'api-header']], function() {
-  // Protected Resources
-  Route::get('users/list', function() {
-      $users = App\User::all();
-      $response = ['success' => true, 'data' => $users];
+  Route::get('user/home', function() {
+      $user = Auth::user();
+      $response = ['success' => true, 'data' => $user];
       return response()->json($response, 201);
   });
 });

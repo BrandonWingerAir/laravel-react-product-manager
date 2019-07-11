@@ -17,19 +17,19 @@ class Home extends React.Component {
       token: localStorage["appState"]
       ? JSON.parse(localStorage["appState"]).user.auth_token
       : "",
-      users: []
+      user: {}
     };
   }
 
   componentDidMount() {
-    axios.get(`api/users/list?token=${this.state.token}`)
+    axios.get(`api/user/home?token=${this.state.token}`)
     .then(response => {
       console.log(response);
       return response;
     })
     .then(json => {
       if (json.data.success) {
-        this.setState({ users: json.data.data });
+        this.setState({ user: json.data.data });
       } else alert("Login Failed!");
     })
     .catch(error => {
@@ -43,8 +43,7 @@ class Home extends React.Component {
         <h2>Welcome Home {"\u2728"}</h2>
         <p>Member List</p>
         <ul>
-          { this.state.users.map(
-            user => <ol style={{ 
+            <ol style={{ 
               padding: 15, 
               border: "1px solid #ccc",
               width: 250,
@@ -52,11 +51,10 @@ class Home extends React.Component {
               marginBottom: 15,
               marginLeft: "auto",
               marginRight: "auto"
-            }} key={user.id}>
-              <p>Name: {user.name}</p>
-              <p>Email: {user.email}</p>
+            }} key={this.state.user.id}>
+              <p>Name: {this.state.user.name}</p>
+              <p>Email: {this.state.user.email}</p>
             </ol>
-          ) }
         </ul>
         <button
           style={{ padding: 10, backgroundColor: "red", color: "white" }}

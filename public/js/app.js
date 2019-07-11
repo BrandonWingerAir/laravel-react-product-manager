@@ -44661,12 +44661,13 @@ var Main = function (_Component) {
 
                 return response;
             }).then(function (json) {
-                if (json.data.success) {
+                console.log(json);
+                if (json.data[0].success) {
                     var userData = {
-                        name: json.data.data.name,
-                        id: json.data.data.id,
-                        email: json.data.data.email,
-                        auth_token: json.data.data.auth_token,
+                        name: json.data[0].data.name,
+                        id: json.data[0].data.id,
+                        email: json.data[0].data.email,
+                        auth_token: json.data[0].data.auth_token,
                         timestamp: new Date().toString()
                     };
 
@@ -44750,7 +44751,7 @@ var Main = function (_Component) {
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'h3',
                             null,
-                            'All products (',
+                            'All reviews (',
                             this.state.products.length,
                             ')'
                         ),
@@ -58721,7 +58722,7 @@ var Home = function (_React$Component) {
 
     _this.state = {
       token: localStorage["appState"] ? JSON.parse(localStorage["appState"]).user.auth_token : "",
-      users: []
+      user: {}
     };
     return _this;
   }
@@ -58731,12 +58732,12 @@ var Home = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get("api/users/list?token=" + this.state.token).then(function (response) {
+      __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get("api/user/home?token=" + this.state.token).then(function (response) {
         console.log(response);
         return response;
       }).then(function (json) {
         if (json.data.success) {
-          _this2.setState({ users: json.data.data });
+          _this2.setState({ user: json.data.data });
         } else alert("Login Failed!");
       }).catch(function (error) {
         // alert(`An Error Occurred! ${error}`);
@@ -58762,32 +58763,30 @@ var Home = function (_React$Component) {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "ul",
           null,
-          this.state.users.map(function (user) {
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "ol",
-              { style: {
-                  padding: 15,
-                  border: "1px solid #ccc",
-                  width: 250,
-                  textAlign: "left",
-                  marginBottom: 15,
-                  marginLeft: "auto",
-                  marginRight: "auto"
-                }, key: user.id },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "p",
-                null,
-                "Name: ",
-                user.name
-              ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "p",
-                null,
-                "Email: ",
-                user.email
-              )
-            );
-          })
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "ol",
+            { style: {
+                padding: 15,
+                border: "1px solid #ccc",
+                width: 250,
+                textAlign: "left",
+                marginBottom: 15,
+                marginLeft: "auto",
+                marginRight: "auto"
+              }, key: this.state.user.id },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "p",
+              null,
+              "Name: ",
+              this.state.user.name
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "p",
+              null,
+              "Email: ",
+              this.state.user.email
+            )
+          )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "button",
