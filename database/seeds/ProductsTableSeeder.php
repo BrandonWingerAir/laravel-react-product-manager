@@ -20,7 +20,8 @@ class ProductsTableSeeder extends Seeder
                 'title' => $faker->unique()->devicePlatform,
                 'description' => $faker->unique()->ean8,
                 'price' => $faker->randomNumber(3, true),
-                'availability' => $faker->boolean(50)
+                'availability' => $faker->boolean(50),
+                'posted_by' => 'Admin'
             ]);
         }
     }

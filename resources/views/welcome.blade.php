@@ -5,11 +5,12 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Product Manager</title>
+        <title>OS Review - Operating System Reviews</title>
         <link href="{{mix('css/app.css')}}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     </head>
     <body>
-        <h1 class="text-center">Electronics Reviews</h1>
+        <h1 class="text-center">OS Review <i class="fa fa-laptop" aria-hidden="true"></i></h1>
         <hr>
         <div id="root"></div>
 

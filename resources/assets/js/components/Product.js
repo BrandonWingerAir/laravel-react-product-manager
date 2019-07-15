@@ -7,38 +7,54 @@ const Product = props => {
     update,
     deleteProduct,
     handleDeleteConfirm,
-    token
+    token,
+    user
   } = props;
 
   const divStyle = {
-    display: 'inline-block',
-    float: 'left',
-    width: '40vw',
-    margin: '30px 10px 15px 30px',
+    height: '100%',
+    marginLeft: '20px',
+    marginTop: '30px'
   }
 
   if(!product) {
     return(
       <div style={divStyle}>
-        <h2>No product selected.</h2>
+            <h2>No review selected.</h2>
       </div>
     );
   }
     
-  return(  
-    <div style={divStyle}> 
-      <h2>{product.title}</h2>
-      <p>{product.description}</p>
-      <h3>Status: {product.availability ? 'Available' : 'Out of stock'}</h3>
-      <h3>Price: ${product.price}</h3>
-      { token === true ? (
-        <div>
-          <input className="btn btn-info" type="button" value="Edit" onClick={e => handleEdit()}/>
-          <input className="btn btn-danger" type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
-        </div>
-      ) : (
-        <div>Login to add a review.</div>
-      )}
+  return(
+    <div style={divStyle} className="list-group">
+      <div className="panel panel-primary">
+        <h2 className="list-group-item-heading text-center">
+          {product.title}
+        </h2>
+      </div>
+        
+      <h4 className="text-center">Reviewed by: {product.posted_by}</h4>
+
+      <hr style={{ width: '50%' }}/>
+      
+      <div className="list-group-item" style={{ paddingLeft: '30px' }}>
+        <h3>
+          Status: {product.availability ? 'Available' : 'Out of stock'}
+        </h3>
+
+        <h3>
+          Price: ${product.price}
+        </h3>
+        
+        { user && product.posted_by === user.name ? (
+          <div>
+            <input className="btn btn-info" type="button" value="Edit" onClick={e => handleEdit()}/>
+            <input className="btn btn-danger" type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
+          </div>
+        ) : (
+          <div/>
+        )}
+      </div>
     </div>
   )
 }

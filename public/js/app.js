@@ -44417,8 +44417,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -44450,7 +44448,7 @@ var Main = function (_Component) {
             products: [],
             currentProduct: null,
             editBtnClicked: false,
-            isLoggedIn: false,
+            isLoggedIn: localStorage["appState"] ? JSON.parse(localStorage["appState"]).isLoggedIn : false,
             user: {},
             token: localStorage["appState"] ? JSON.parse(localStorage["appState"]).user.auth_token : ""
         };
@@ -44467,6 +44465,19 @@ var Main = function (_Component) {
     }
 
     _createClass(Main, [{
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            if (!this.state.isLoggedIn && this.props.location.pathname !== "/login" && this.props.location.pathname !== "/register") {
+                console.log("Redirecting to login");
+                this.props.history.push("/login");
+            }
+
+            if (this.state.isLoggedIn && (this.props.location.pathname === "/login" || this.props.location.pathname === "/register")) {
+                console.log("Redirecting to dashboard");
+                this.props.history.push("/");
+            }
+        }
+    }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
             var _this2 = this;
@@ -44481,8 +44492,7 @@ var Main = function (_Component) {
 
             if (state) {
                 var storedState = JSON.parse(state);
-                console.log(storedState);
-                this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState });
+                this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });
             }
         }
     }, {
@@ -44604,14 +44614,13 @@ var Main = function (_Component) {
         value: function _loginUser(email, password) {
             var _this7 = this;
 
-            __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#login-form button").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
+            __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
 
             var formData = new FormData();
             formData.append("email", email);
             formData.append("password", password);
 
             __WEBPACK_IMPORTED_MODULE_9_axios___default.a.post("api/user/login/", formData).then(function (response) {
-                console.log(response);
                 return response;
             }).then(function (json) {
                 if (json.data.success) {
@@ -44632,14 +44641,15 @@ var Main = function (_Component) {
 
                     _this7.setState({
                         isLoggedIn: appState.isLoggedIn,
-                        user: appState.user
+                        user: appState.user,
+                        token: appState.user.auth_token
                     });
-                } else alert("Login Failed!");
+                } else {
+                    alert("Login Failed!");
+                }
 
                 __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#login-form button").removeAttr("disabled").html("Login");
             }).catch(function (error) {
-                // alert(`An Error Occurred! ${error}`);
-
                 __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#login-form button").removeAttr("disabled").html("Login");
             });
         }
@@ -44648,7 +44658,7 @@ var Main = function (_Component) {
         value: function _registerUser(name, email, password) {
             var _this8 = this;
 
-            __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#email-login-btn").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>');
+            __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>');
 
             var formData = new FormData();
 
@@ -44657,12 +44667,9 @@ var Main = function (_Component) {
             formData.append("password", password);
 
             __WEBPACK_IMPORTED_MODULE_9_axios___default.a.post("api/user/register", formData).then(function (response) {
-                console.log(response);
-                console.log('test');
 
                 return response;
             }).then(function (json) {
-                console.log(json);
                 if (json.data[0].success) {
                     var userData = {
                         name: json.data[0].data.name,
@@ -44689,10 +44696,9 @@ var Main = function (_Component) {
                     __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#email-login-btn").removeAttr("disabled").html("Register");
                 }
             }).catch(function (error) {
-                // alert("An Error Occurred!" + error);
                 console.log(formData + ' ' + error);
 
-                __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#email-login-btn").removeAttr("disabled").html("Register");
+                __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").removeAttr("disabled").html("Register");
             });
         }
     }, {
@@ -44700,7 +44706,8 @@ var Main = function (_Component) {
         value: function _logoutUser() {
             var appState = {
                 isLoggedIn: false,
-                user: {}
+                user: {},
+                token: ''
             };
 
             localStorage["appState"] = JSON.stringify(appState);
@@ -44709,66 +44716,87 @@ var Main = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _divStyle,
-                _this9 = this;
+            var _this9 = this;
 
-            var mainDivStyle = {
-                display: "flex",
-                flexDirection: "row"
-            };
-
-            var divStyle = (_divStyle = {
-                justifyContent: "flex-start",
-                padding: '10px',
-                minWidth: '30vw',
-                maxWidth: '30vw',
+            var divStyle = {
                 height: '100%',
-                background: '#f0f0f0'
-            }, _defineProperty(_divStyle, 'padding', '20px 20px 20px 20px'), _defineProperty(_divStyle, 'margin', '30px 10px'), _divStyle);
-
-            var loggedInStyle = {
-                // display: "flex"
+                background: '#f0f0f0',
+                padding: '10px 30px',
+                margin: '30px'
             };
-
-            if (!this.state.isLoggedIn && this.props.location.pathname !== "/login" && this.props.location.pathname !== "/register") {
-                console.log("Not logged in and are not visting login or register, go to login page.");
-                this.props.history.push("/login");
-            }
-
-            if (this.state.isLoggedIn && (this.props.location.pathname === "/login" || this.props.location.pathname === "/register")) {
-                console.log("Attempting to login or register while logged in!");
-                this.props.history.push("/");
-            }
 
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'div',
                 null,
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
-                    { style: mainDivStyle },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    { className: 'row margin-0' },
+                    this.state.editBtnClicked === false ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'div',
-                        { style: divStyle },
+                        { className: 'col-xs-12 col-md-5 col-md-push-3 padding-0' },
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            'h3',
-                            null,
-                            'All reviews (',
-                            this.state.products.length,
-                            ')'
+                            'div',
+                            { className: 'row margin-0' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                { className: 'col-md-12 padding-0' },
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__Product__["a" /* default */], {
+                                    product: this.state.currentProduct,
+                                    deleteProduct: this.handleDeleteProduct,
+                                    handleDeleteConfirm: this.handleDeleteConfirm,
+                                    handleEdit: this.handleEdit,
+                                    token: this.state.token,
+                                    user: this.state.user
+                                })
+                            )
                         ),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            'ul',
-                            null,
-                            this.renderProducts()
+                            'div',
+                            { className: 'row margin-0' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                { className: 'col-md-12 padding-0' },
+                                this.state.token ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
+                                    null,
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__AddProduct__["a" /* default */], { onAdd: this.handleAddProduct })
+                                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
+                            )
+                        )
+                    ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { className: 'col-xs-12 col-md-5 col-md-push-3 padding-0' },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__EditProduct__["a" /* default */], {
+                            product: this.state.currentProduct,
+                            update: this.handleUpdate
+                        })
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { className: 'col-xs-12 col-md-3 col-md-pull-5 padding-0' },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'div',
+                            { style: divStyle },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                null,
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'h3',
+                                    null,
+                                    'All reviews (',
+                                    this.state.products.length,
+                                    ')'
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { borderColor: '#e0e0e0' } }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'ul',
+                                    null,
+                                    this.renderProducts()
+                                )
+                            )
                         )
                     ),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__Product__["a" /* default */], {
-                        product: this.state.currentProduct,
-                        deleteProduct: this.handleDeleteProduct,
-                        handleDeleteConfirm: this.handleDeleteConfirm,
-                        handleEdit: this.handleEdit,
-                        token: this.state.token
-                    }),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         __WEBPACK_IMPORTED_MODULE_2_react_router_dom__["d" /* Switch */],
                         { data: 'data' },
@@ -44787,19 +44815,11 @@ var Main = function (_Component) {
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_react_router_dom__["c" /* Route */], { exact: true, path: '/', render: function render(props) {
                                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'div',
-                                    null,
-                                    _this9.state.editBtnClicked === true ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__EditProduct__["a" /* default */], {
-                                        product: _this9.state.currentProduct,
-                                        update: _this9.handleUpdate
-                                    }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                        'div',
-                                        { style: loggedInStyle },
-                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__Home__["a" /* default */], _extends({}, props, {
-                                            logoutUser: _this9._logoutUser,
-                                            user: _this9.state.user
-                                        })),
-                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__AddProduct__["a" /* default */], { onAdd: _this9.handleAddProduct })
-                                    )
+                                    { className: 'col-xs-12 col-md-4 padding-0' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__Home__["a" /* default */], _extends({}, props, {
+                                        logoutUser: _this9._logoutUser,
+                                        user: _this9.state.user
+                                    }))
                                 );
                             } })
                     )
@@ -58103,14 +58123,14 @@ var Product = function Product(props) {
       update = props.update,
       deleteProduct = props.deleteProduct,
       handleDeleteConfirm = props.handleDeleteConfirm,
-      token = props.token;
+      token = props.token,
+      user = props.user;
 
 
   var divStyle = {
-    display: 'inline-block',
-    float: 'left',
-    width: '40vw',
-    margin: '30px 10px 15px 30px'
+    height: '100%',
+    marginLeft: '20px',
+    marginTop: '30px'
   };
 
   if (!product) {
@@ -58120,49 +58140,55 @@ var Product = function Product(props) {
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h2',
         null,
-        'No product selected.'
+        'No review selected.'
       )
     );
   }
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'div',
-    { style: divStyle },
+    { style: divStyle, className: 'list-group' },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h2',
-      null,
-      product.title
-    ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'p',
-      null,
-      product.description
-    ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h3',
-      null,
-      'Status: ',
-      product.availability ? 'Available' : 'Out of stock'
-    ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h3',
-      null,
-      'Price: $',
-      product.price
-    ),
-    token === true ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      null,
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-info', type: 'button', value: 'Edit', onClick: function onClick(e) {
-          return handleEdit();
-        } }),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-danger', type: 'button', value: 'Delete', onClick: function onClick(e) {
-          return handleDeleteConfirm();
-        } })
-    ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      { className: 'panel panel-primary' },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h2',
+        { className: 'list-group-item-heading text-center' },
+        product.title
+      )
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'h4',
+      { className: 'text-center' },
+      'Reviewed by: ',
+      product.posted_by
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { width: '50%' } }),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      null,
-      'Login to add a review.'
+      { className: 'list-group-item', style: { paddingLeft: '30px' } },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h3',
+        null,
+        'Status: ',
+        product.availability ? 'Available' : 'Out of stock'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h3',
+        null,
+        'Price: $',
+        product.price
+      ),
+      user && product.posted_by === user.name ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-info', type: 'button', value: 'Edit', onClick: function onClick(e) {
+            return handleEdit();
+          } }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-danger', type: 'button', value: 'Delete', onClick: function onClick(e) {
+            return handleDeleteConfirm();
+          } })
+      ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
     )
   );
 };
@@ -58196,6 +58222,7 @@ var AddProduct = function (_Component) {
 
     _this.state = {
       newProduct: {
+        id: '',
         title: '',
         description: '',
         price: 0,
@@ -58226,17 +58253,9 @@ var AddProduct = function (_Component) {
     value: function render() {
       var _this2 = this;
 
-      var mainDivStyle = {
-        display: 'inline-block',
-        width: '40vw'
-      };
-
       var divStyle = {
-        position: 'inline-block',
-        marginTop: '30px',
-        flexDirection: 'space-between',
-        marginLeft: '30px',
-        width: '40vw'
+        marginLeft: '20px',
+        marginRight: '20px'
       };
 
       var createPriceStyle = {
@@ -58245,8 +58264,7 @@ var AddProduct = function (_Component) {
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
-        { style: mainDivStyle },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+        null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { style: divStyle },
@@ -58540,81 +58558,58 @@ var Register = function Register(_ref) {
     registerUser(_name.value, _email.value, _password.value);
   };
 
+  var inputStyle = { width: '70%', marginBottom: '20px' };
+
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     "div",
     { id: "main" },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      "form",
-      { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center" },
+      "div",
+      { className: "col-md-4 padding-0" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "h3",
-        { style: { padding: 15 } },
-        "Register Form"
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "form-group" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-            return _name = input;
-          }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block", placeholder: "Name" })
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "form-group" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-            return _email = input;
-          }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email" })
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "form-group" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-            return _password = input;
-          }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password" })
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "button",
-        { type: "submit", className: "btn btn-primary center-block text-center", id: "email-login-btn", href: "#facebook" },
-        "Register"
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-        { to: "/login" },
-        "Login"
+        "form",
+        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center", style: { border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' } },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "h3",
+          { style: { boxSizing: 'border-box', margin: 0, padding: '25px', background: '#f5f5f5 ' } },
+          "Register"
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("hr", { style: { marginTop: 0, borderColor: '#e0e0e0' } }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "form-group" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+              return _name = input;
+            }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block", style: inputStyle, placeholder: "Name" })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "form-group" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+              return _email = input;
+            }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", style: inputStyle, placeholder: "Email" })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "form-group" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+              return _password = input;
+            }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", style: inputStyle, placeholder: "Password" })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "button",
+          { type: "submit", className: "btn btn-primary center-block text-center email-login-btn", style: { marginBottom: '10px' }, href: "#!" },
+          "Register"
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
+          { to: "/login" },
+          "Login"
+        )
       )
     )
   );
 };
-
-// const styles = {
-//   input: {
-//     backgroundColor: "white",
-//     border: "1px solid #ccc",
-//     padding: 15,
-//     float: "left",
-//     clear: "right",
-//     width: "80%",
-//     margin: 15
-//   },
-//   button: {
-//     height: 44,
-//     boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.1)",
-//     border: "none",
-//     backgroundColor: "red",
-//     margin: 15,
-//     float: "left",
-//     clear: "both",
-//     width: "85%",
-//     color: "white",
-//     padding: 15
-//   },
-//   link: {
-//     width: "100%",
-//     float: "left",
-//     clear: "both",
-//     textAlign: "center"
-//   }
-// };
 
 /* harmony default export */ __webpack_exports__["a"] = (Register);
 
@@ -58644,74 +58639,51 @@ var Login = function Login(_ref) {
     loginUser(_email.value, _password.value);
   };
 
+  var inputStyle = { width: '70%', marginBottom: '20px' };
+
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     "div",
     { id: "main" },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      "form",
-      { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center" },
+      "div",
+      { className: "col-xs-12 col-md-4 padding-0" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "h3",
-        { style: { padding: 15 } },
-        "User Login"
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "form-group" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-            return _email = input;
-          }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email" })
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "form-group" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-            return _password = input;
-          }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password" })
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "button",
-        { type: "submit", className: "btn btn-primary center-block", id: "email-login-btn", href: "#facebook" },
-        "Login"
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-        { to: "/register" },
-        "Register"
+        "form",
+        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center", style: { border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' } },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "h3",
+          { style: { boxSizing: 'border-box', margin: 0, padding: '25px', background: '#f5f5f5 ' } },
+          "Login"
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("hr", { style: { marginTop: 0, borderColor: '#e0e0e0' } }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "form-group" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+              return _email = input;
+            }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email", style: inputStyle })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "form-group" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+              return _password = input;
+            }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password", style: inputStyle })
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "button",
+          { type: "submit", className: "btn btn-primary center-block email-login-btn", style: { margin: '20px auto 10px' }, href: "#!" },
+          "Login"
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
+          { to: "/register" },
+          "Register"
+        )
       )
     )
   );
 };
-
-// const styles = {
-//   input: {
-//     backgroundColor: "white",
-//     border: "1px solid #ccc",
-//     padding: 15,
-//     float: "left",
-//     clear: "right",
-//     width: "80%",
-//     margin: 15
-//   },
-//   button: {
-//     height: 44,
-//     boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.1)",
-//     border: "none",
-//     backgroundColor: "red",
-//     margin: 15,
-//     float: "left",
-//     clear: "both",
-//     width: "85%",
-//     color: "white",
-//     padding: 15
-//   },
-//   link: {
-//     width: "100%",
-//     float: "left",
-//     clear: "both",
-//     textAlign: "center"
-//   }
-// };
 
 /* harmony default export */ __webpack_exports__["a"] = (Login);
 
@@ -58737,10 +58709,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var styles = {
   fontFamily: "sans-serif",
-  textAlign: "center",
-  display: "inline-block",
-  float: "right",
-  marginRight: "3vw"
+  textAlign: "center"
 };
 
 var Home = function (_React$Component) {
@@ -58764,14 +58733,13 @@ var Home = function (_React$Component) {
       var _this2 = this;
 
       __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get("api/user/home?token=" + this.state.token).then(function (response) {
-        console.log(response);
         return response;
       }).then(function (json) {
         if (json.data.success) {
           _this2.setState({ user: json.data.data });
         } else alert("Login Failed!");
       }).catch(function (error) {
-        // alert(`An Error Occurred! ${error}`);
+        alert("An Error Occurred! " + error);
       });
     }
   }, {
@@ -58789,40 +58757,26 @@ var Home = function (_React$Component) {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "p",
           null,
-          "Member List"
+          "Dashboard"
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "ul",
-          null,
+          "div",
+          { className: "panel panel-default", style: { width: '80%', margin: '0 auto 15px' } },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "ol",
-            { style: {
-                padding: 15,
-                border: "1px solid #ccc",
-                width: 250,
-                textAlign: "left",
-                marginBottom: 15,
-                marginLeft: "auto",
-                marginRight: "auto"
-              }, key: this.state.user.id },
+            "div",
+            { className: "panel-body" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "p",
               null,
-              "Name: ",
+              "Username: ",
               this.state.user.name
-            ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "p",
-              null,
-              "Email: ",
-              this.state.user.email
             )
           )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "button",
           {
-            style: { padding: 10, backgroundColor: "red", color: "white" },
+            className: "btn btn-info",
             onClick: this.props.logoutUser
           },
           "Logout",

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsController extends Controller
 {
@@ -32,7 +33,7 @@ class ProductsController extends Controller
             'availability'  => 'boolean'
         ]);
         
-        $product = Product::create($request->all());
+        $product = Product::create($request->all() + ['posted_by' => Auth::user()->name]);
         return response()->json($product, 201);
     }
 

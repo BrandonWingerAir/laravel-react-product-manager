@@ -15,6 +15,7 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('posted_by');
             $table->timestamps();
             $table->string('title');
             $table->text('description');

@@ -5,6 +5,7 @@ class AddProduct extends Component {
     super(props);
       this.state = {
         newProduct: {
+            id: '',
             title: '',
             description: '',
             price: 0,
@@ -28,17 +29,9 @@ class AddProduct extends Component {
   }
 
   render() {
-    const mainDivStyle = {
-      display: 'inline-block',
-      width: '40vw'
-    }
-
     const divStyle = {
-      position: 'inline-block',
-      marginTop: '30px',
-      flexDirection: 'space-between',
-      marginLeft: '30px',
-      width: '40vw'
+      marginLeft: '20px',
+      marginRight: '20px'
     }
     
     const createPriceStyle = {
@@ -46,8 +39,7 @@ class AddProduct extends Component {
     }
 
     return(
-      <div style={mainDivStyle}> 
-        <hr/>
+      <div> 
         <div style={divStyle}> 
           <h2>New Product</h2>
           <form onSubmit={this.handleSubmit}>

@@ -19,7 +19,9 @@ export default class Main extends Component {
             products: [],
             currentProduct: null,
             editBtnClicked: false,
-            isLoggedIn: false,
+            isLoggedIn: localStorage["appState"]
+            ? JSON.parse(localStorage["appState"]).isLoggedIn
+            : false,
             user: {},
             token: localStorage["appState"]
                 ? JSON.parse(localStorage["appState"]).user.auth_token
@@ -36,6 +38,26 @@ export default class Main extends Component {
         this._logoutUser = this._logoutUser.bind(this);
     }
 
+    componentDidUpdate() {
+        if (
+            !this.state.isLoggedIn &&
+            this.props.location.pathname !== "/login" &&
+            this.props.location.pathname !== "/register"
+        ) {
+            console.log("Redirecting to login");
+            this.props.history.push("/login");
+        }
+
+        if (
+            this.state.isLoggedIn &&
+            (this.props.location.pathname === "/login" ||
+                this.props.location.pathname === "/register")
+        ) {
+            console.log("Redirecting to dashboard");
+            this.props.history.push("/");
+        }
+    }
+
     componentDidMount() {
         fetch('/api/products')
         .then(response => {
@@ -49,8 +71,7 @@ export default class Main extends Component {
 
         if (state) {
             let storedState = JSON.parse(state);
-            console.log(storedState);
-            this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState });
+            this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });
         }
     }
 
@@ -77,7 +98,7 @@ export default class Main extends Component {
 
     handleClick(product) {
         this.state.editBtnClicked = false
-        this.setState({ currentProduct:product });
+        this.setState({ currentProduct: product });
     }
 
     handleAddProduct(product) {
@@ -97,7 +118,7 @@ export default class Main extends Component {
         .then( data => {
             this.setState((prevState)=> ({
                 products: prevState.products.concat(data),
-                currentProduct : data
+                currentProduct: data
             }));
         });
     }
@@ -154,7 +175,7 @@ export default class Main extends Component {
     }
 
     _loginUser(email, password) {
-        $("#login-form button")
+        $(".email-login-btn")
             .attr("disabled", "disabled")
             .html(
             '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -167,7 +188,6 @@ export default class Main extends Component {
         axios
             .post("api/user/login/", formData)
             .then(response => {
-            console.log(response);
             return response;
         })
         .then(json => {
@@ -189,17 +209,18 @@ export default class Main extends Component {
 
                 this.setState({
                     isLoggedIn: appState.isLoggedIn,
-                    user: appState.user
+                    user: appState.user,
+                    token: appState.user.auth_token
                 });
-            } else alert("Login Failed!");
+            } else {
+                alert("Login Failed!");
+            } 
 
             $("#login-form button")
                 .removeAttr("disabled")
                 .html("Login");
         })
         .catch(error => {
-            // alert(`An Error Occurred! ${error}`);
-
             $("#login-form button")
                 .removeAttr("disabled")
                 .html("Login");
@@ -207,7 +228,7 @@ export default class Main extends Component {
     };
 
     _registerUser(name, email, password) {
-        $("#email-login-btn")
+        $(".email-login-btn")
             .attr("disabled", "disabled")
             .html(
             '<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -221,13 +242,10 @@ export default class Main extends Component {
 
         axios.post("api/user/register", formData)
             .then(response => {
-            console.log(response);
-            console.log('test');
             
             return response;
         })
         .then(json => {  
-            console.log(json);
             if (json.data[0].success) {
                 let userData = {
                     name: json.data[0].data.name,
@@ -257,10 +275,9 @@ export default class Main extends Component {
             }
         })
         .catch(error => {
-            // alert("An Error Occurred!" + error);
             console.log(`${formData} ${error}`);
             
-            $("#email-login-btn")
+            $(".email-login-btn")
                 .removeAttr("disabled")
                 .html("Register");
         });
@@ -269,68 +286,72 @@ export default class Main extends Component {
     _logoutUser() {
         let appState = {
             isLoggedIn: false,
-            user: {}
-        };
-    
+            user: {},
+            token: ''
+        };        
+
         localStorage["appState"] = JSON.stringify(appState);
         this.setState(appState);
     };
     
     render() {
-        const mainDivStyle =  {
-            display: "flex",
-            flexDirection: "row"
-        }
-        
         const divStyle = {
-            justifyContent: "flex-start",
-            padding: '10px',
-            minWidth: '30vw',
-            maxWidth: '30vw',
             height: '100%',
             background: '#f0f0f0',
-            padding: '20px 20px 20px 20px',
-            margin: '30px 10px'
-        }
-
-        const loggedInStyle = {
-            // display: "flex"
-        }
-
-        if (
-            !this.state.isLoggedIn &&
-            this.props.location.pathname !== "/login" &&
-            this.props.location.pathname !== "/register"
-        ) {
-            console.log("Not logged in and are not visting login or register, go to login page.");
-            this.props.history.push("/login");
-        }
-
-        if (
-            this.state.isLoggedIn &&
-            (this.props.location.pathname === "/login" ||
-                this.props.location.pathname === "/register")
-        ) {
-            console.log("Attempting to login or register while logged in!");
-            this.props.history.push("/");
+            padding: '10px 30px',
+            margin: '30px'
         }
 
         return (
             <div>
-                <div style={mainDivStyle}>
-                    <div style={divStyle}>
-                        <h3>All reviews ({this.state.products.length})</h3>
-                        <ul>
-                            { this.renderProducts() }
-                        </ul>
+                <div className="row margin-0">
+                    { this.state.editBtnClicked === false ? (
+                    <div className="col-xs-12 col-md-5 col-md-push-3 padding-0">
+                        <div className="row margin-0">
+                            <div className="col-md-12 padding-0">
+                                <Product 
+                                    product = {this.state.currentProduct} 
+                                    deleteProduct = {this.handleDeleteProduct}
+                                    handleDeleteConfirm = {this.handleDeleteConfirm}
+                                    handleEdit = {this.handleEdit}
+                                    token = {this.state.token}
+                                    user = {this.state.user}
+                                />
+                            </div>
+                        </div>
+                        <div className="row margin-0">
+                            <div className="col-md-12 padding-0">
+                                { this.state.token ? (
+                                    <div>
+                                        <hr/>
+                                        <AddProduct onAdd={this.handleAddProduct} />
+                                    </div>
+                                ) : (
+                                    <div/>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <Product 
-                        product = {this.state.currentProduct} 
-                        deleteProduct = {this.handleDeleteProduct}
-                        handleDeleteConfirm = {this.handleDeleteConfirm}
-                        handleEdit = {this.handleEdit}
-                        token = {this.state.token}
-                    />
+                    ) : (
+                    <div className="col-xs-12 col-md-5 col-md-push-3 padding-0">
+                        <EditProduct
+                            product={this.state.currentProduct}
+                            update={this.handleUpdate}
+                        />
+                    </div>
+                    )}
+                    <div className="col-xs-12 col-md-3 col-md-pull-5 padding-0">
+                        <div style={divStyle}>
+                            <div>
+                                <h3>All reviews ({this.state.products.length})</h3>
+                                <hr style={{ borderColor: '#e0e0e0' }}/>
+                                <ul>
+                                    { this.renderProducts() }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <Switch data="data">
                         <Route
                             path="/login"
@@ -341,23 +362,14 @@ export default class Main extends Component {
                             path="/register"
                             render={ props => <Register {...props} registerUser={this._registerUser}/> }
                         />
+                        
                         <Route exact path="/" render={props => (
-                            <div>
-                                {this.state.editBtnClicked === true ? (
-                                    <EditProduct
-                                        product={this.state.currentProduct}
-                                        update={this.handleUpdate}
-                                    />
-                                ) : (
-                                    <div style={loggedInStyle}>
-                                        <Home
-                                            {...props}
-                                            logoutUser={this._logoutUser}
-                                            user={this.state.user}
-                                        />
-                                        <AddProduct onAdd={this.handleAddProduct} /> 
-                                    </div>
-                                )}
+                            <div className="col-xs-12 col-md-4 padding-0">
+                                <Home
+                                    {...props}
+                                    logoutUser={this._logoutUser}
+                                    user={this.state.user}
+                                />
                             </div>
                         )}/>
                     </Switch>
