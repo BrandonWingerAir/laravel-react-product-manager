@@ -37,3 +37,21 @@ input[type="button"] {
 input[type="submit"] {
   margin: 10px 0 20px;
 }
+
+@media screen and (max-width: '768px') {
+  .reorder-xs {
+    display: inline-block;
+    transform: rotate(180deg);
+  }
+
+  .reorder-xs > [class*= "col-"] {
+    transform: rotate(-180deg);
+  }
+}
+
+@media screen and (min-width: '768px') {
+  #all-reviews {
+    position: absolute;
+    top: 110px;
+  }
+}

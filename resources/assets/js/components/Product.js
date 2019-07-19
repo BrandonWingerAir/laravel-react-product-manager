@@ -2,7 +2,10 @@ import React from 'react';
 
 const Product = props => {
   const {
+    renderNewProducts,
     product,
+    newReviewForm,
+    editBtnClicked,
     handleEdit,
     update,
     deleteProduct,
@@ -13,48 +16,130 @@ const Product = props => {
 
   const divStyle = {
     height: '100%',
-    marginLeft: '20px',
-    marginTop: '30px'
+    marginLeft: '30px',
+    marginTop: '30px',
+    height: '100vh'
   }
 
-  if(!product) {
+  const reviewStars = (star) => {
+    star = Math.round(star);
+    
+    var stars = [];
+
+    for (var i = 0; i < star; i++) {
+      stars.push(
+        <li key={i}><span className="fa fa-star" aria-hidden="true" style={{ color: '#fdd835' }}></span></li>
+      );
+    }
+
+    return stars;
+  }
+
+  const renderThumbs = true;
+
+  if (!product && !newReviewForm && !editBtnClicked) {
     return(
       <div style={divStyle}>
-            <h2>No review selected.</h2>
+        <h2>No review selected.</h2>
+        
+        { token ? (
+          <div/>
+        ) : (
+          <p>Log in to post a review</p>
+        )}
+
+        <hr style={{ borderColor: '#e0e0e0', margin: '20px 0' }}/>
+
+        <div className="panel panel-default text-center" style={{ margin: '15px' }}>
+          <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+            <h3>Latest Reviews</h3>
+          </div>
+          <div>
+            <ul className="list-group" style={{ marginBottom: '0' }}>
+                { renderNewProducts(5, renderThumbs) }
+            </ul>
+          </div>
+        </div>
       </div>
     );
+  } else if (newReviewForm || editBtnClicked) {
+    return(
+      <div/>
+    )
   }
     
   return(
-    <div style={divStyle} className="list-group">
-      <div className="panel panel-primary">
-        <h2 className="list-group-item-heading text-center">
+    <div style={divStyle}>
+      <div className="panel panel-primary text-center" style={{ background: '#616161', color: '#fff' }}>
+        <h2 className="list-group-item-heading">
           {product.title}
         </h2>
       </div>
-        
-      <h4 className="text-center">Reviewed by: {product.posted_by}</h4>
 
-      <hr style={{ width: '50%' }}/>
+      { product.image ? (
+        <img src={"http://localhost:8000/" + product.image} alt="" className="img-responsive img-thumbnail center-block" style={{ width: '80%', height: '370px', marginTop: '30px' }}/>
+      ) : (
+        <div/>
+      )}
+        
+      <h4 className="text-center">Posted by: {product.posted_by}</h4>
+
+      <hr className="text-center" style={{ width: '50%' }}/>
       
-      <div className="list-group-item" style={{ paddingLeft: '30px' }}>
-        <h3>
-          Status: {product.availability ? 'Available' : 'Out of stock'}
-        </h3>
+      <div className="list-group-item text-center">
+        
+        <ul className="list-unstyled list-inline">
+          {(reviewStars(product.rating))}
+        </ul>
+        <h4><b>Version:</b> {product.description}</h4>
 
         <h3>
-          Price: ${product.price}
+          <b>Recommended:</b> 
+          {
+            product.availability 
+            ? <i className="fa fa-thumbs-up text-success" aria-hidden="true"></i>
+            : <i className="fa fa-thumbs-down text-danger" aria-hidden="true"></i>
+          }
         </h3>
+
+        <h4><b>Support:</b> {product.user_interface} / 5</h4>
+
+        <h4><b>Support:</b> {product.speed_size} / 5</h4>
+
+        <h4><b>Support:</b> {product.software} / 5</h4>
+
+        <h4><b>Support:</b> {product.support} / 5</h4>
+
+        <h4><b>Support:</b> {product.administration} / 5</h4>
         
-        { user && product.posted_by === user.name ? (
+        { product.posted_by === user.name ? (
           <div>
-            <input className="btn btn-info" type="button" value="Edit" onClick={e => handleEdit()}/>
-            <input className="btn btn-danger" type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
+            <hr/>
+            <input className="btn btn-info" style={{ margin: '0 10px' }} type="button" value="Edit" onClick={e => handleEdit()}/>
+            <input className="btn btn-danger" style={{ margin: '0 10px' }} type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
           </div>
         ) : (
           <div/>
         )}
       </div>
+
+      { product.image ? (
+        <div/>
+      ) : (
+        <div>
+          <hr/>
+          <div className="panel panel-default text-center" style={{ margin: '15px' }}>
+            <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3>Latest Reviews</h3>
+            </div>
+            <div>
+              <ul className="list-group" style={{ marginBottom: '0' }}>
+                { renderNewProducts(5) }
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

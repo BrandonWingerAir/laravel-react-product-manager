@@ -18,9 +18,15 @@ class CreateProductsTable extends Migration
             $table->string('posted_by');
             $table->timestamps();
             $table->string('title');
+            $table->longText('image');
             $table->text('description');
-            $table->integer('price');
-            $table->boolean('availability');
+            $table->integer('user_interface');
+            $table->integer('speed_size');
+            $table->integer('software');
+            $table->integer('support');
+            $table->integer('administration');
+            $table->float('rating');
+            $table->tinyInteger('availability');
         });
     }
 

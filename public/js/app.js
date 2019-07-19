@@ -44447,12 +44447,15 @@ var Main = function (_Component) {
         _this.state = {
             products: [],
             currentProduct: null,
+            newReviewForm: false,
             editBtnClicked: false,
             isLoggedIn: localStorage["appState"] ? JSON.parse(localStorage["appState"]).isLoggedIn : false,
-            user: {},
+            user: localStorage["appState"] ? localStorage["appState"].user : {},
             token: localStorage["appState"] ? JSON.parse(localStorage["appState"]).user.auth_token : ""
         };
 
+        _this.renderNewProducts = _this.renderNewProducts.bind(_this);
+        _this.renderReviewForm = _this.renderReviewForm.bind(_this);
         _this.handleAddProduct = _this.handleAddProduct.bind(_this);
         _this.handleDeleteProduct = _this.handleDeleteProduct.bind(_this);
         _this.handleDeleteConfirm = _this.handleDeleteConfirm.bind(_this);
@@ -44490,9 +44493,12 @@ var Main = function (_Component) {
 
             var state = localStorage["appState"];
 
-            if (state) {
-                var storedState = JSON.parse(state);
+            var storedState = JSON.parse(state);
+
+            if (Date.parse(new Date()) < Date.parse(storedState.user.token_expire)) {
                 this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });
+            } else {
+                this.setState({ isLoggedIn: false, user: {}, token: '' });
             }
         }
     }, {
@@ -44504,69 +44510,184 @@ var Main = function (_Component) {
                 listStyle: 'none',
                 fontSize: '18px',
                 lineHeight: '1.8em',
-                paddingLeft: '1em'
+                paddingLeft: '1em',
+                borderRadius: '0',
+                borderLeft: '0',
+                borderRight: '0'
             };
 
             return this.state.products.map(function (product) {
                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'li',
                     {
+                        className: 'list-group-item',
                         style: listStyle,
                         onClick: function onClick() {
                             return _this3.handleClick(product);
                         },
-                        key: product.id
+                        key: product.title
                     },
-                    product.title
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'h4',
+                        { style: { display: 'inline-block', marginRight: '5px' } },
+                        product.title
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        Math.round(product.rating),
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', {
+                            className: 'fa fa-star',
+                            'aria-hidden': 'true',
+                            style: { color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }
+                        })
+                    )
                 );
             });
+        }
+    }, {
+        key: 'renderNewProducts',
+        value: function renderNewProducts(limit, renderThumbs) {
+            var _this4 = this;
+
+            var listStyle = {
+                listStyle: 'none',
+                fontSize: '18px',
+                lineHeight: '1.8em',
+                borderRadius: '0'
+            };
+
+            var reviewStars = function reviewStars(star) {
+                var stars = [];
+
+                for (var i = 0; i < star; i++) {
+                    stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'li',
+                        { key: i },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+                    ));
+                }
+
+                return stars;
+            };
+
+            return this.state.products.slice(0).reverse().slice(0, limit).map(function (product) {
+                var newKey = product.title + ' (New)';
+
+                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'li',
+                    {
+                        className: 'list-group-item',
+                        style: listStyle,
+                        onClick: function onClick() {
+                            return _this4.handleClick(product);
+                        },
+                        key: newKey
+                    },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'h4',
+                        { style: { display: 'inline-block' } },
+                        product.title
+                    ),
+                    renderThumbs ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { style: { display: 'inline-block' } },
+                        product.availability ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-thumbs-up text-success', style: { marginLeft: '10px' }, 'aria-hidden': 'true' }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-thumbs-down text-danger', style: { marginLeft: '10px' }, 'aria-hidden': 'true' })
+                    ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'h5',
+                        null,
+                        product.description
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { width: '40%' } }),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'ul',
+                        { className: 'list-unstyled list-inline' },
+                        reviewStars(product.rating)
+                    )
+                );
+            });
+        }
+    }, {
+        key: 'renderReviewForm',
+        value: function renderReviewForm() {
+            this.setState({ newReviewForm: true });
         }
     }, {
         key: 'handleClick',
         value: function handleClick(product) {
             this.state.editBtnClicked = false;
+            this.state.newReviewForm = false;
             this.setState({ currentProduct: product });
         }
     }, {
         key: 'handleAddProduct',
         value: function handleAddProduct(product) {
-            var _this4 = this;
+            var _this5 = this;
 
-            product.price = Number(product.price);
+            product.user_interface = Number(product.user_interface);
+            product.speed_size = Number(product.speed_size);
+            product.software = Number(product.software);
+            product.support = Number(product.support);
+            product.administration = Number(product.administration);
+            product.rating = Number(product.rating);
+            product.availability = Number(product.availability);
 
-            fetch('api/products?token=' + this.state.token, {
+            var formData = new FormData();
+            formData.append("title", product.title);
+            formData.append("image", product.image, product.image.name);
+            formData.append("description", product.description);
+            formData.append("user_interface", product.user_interface);
+            formData.append("speed_size", product.speed_size);
+            formData.append("software", product.software);
+            formData.append("support", product.support);
+            formData.append("administration", product.administration);
+            formData.append("rating", product.rating);
+            formData.append("availability", product.availability);
+
+            console.log(product);
+
+            __WEBPACK_IMPORTED_MODULE_9_axios___default()({
                 method: 'post',
+                url: 'api/products?token=' + this.state.token,
+                data: formData,
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(product)
+                    'Accept': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data'
+                }
             }).then(function (response) {
-                return response.json();
+                return response;
             }).then(function (data) {
-                _this4.setState(function (prevState) {
+                console.log(data);
+
+                console.log('Prev State:');
+                console.log(_this5.prevState);
+
+                _this5.setState(function (prevState) {
                     return {
-                        products: prevState.products.concat(data),
-                        currentProduct: data
+                        products: prevState.products.concat(data.data),
+                        currentProduct: data.data
                     };
                 });
+
+                console.log(_this5.state.products);
             });
         }
     }, {
         key: 'handleDeleteProduct',
         value: function handleDeleteProduct() {
-            var _this5 = this;
+            var _this6 = this;
 
             var currentProduct = this.state.currentProduct;
 
             fetch('api/products/' + currentProduct.id + '?token=' + this.state.token, {
                 method: "delete"
             }).then(function (response) {
-                var productsArray = _this5.state.products.filter(function (item) {
+                var productsArray = _this6.state.products.filter(function (item) {
                     return item !== currentProduct;
                 });
 
-                _this5.setState({ products: productsArray, currentProduct: null });
+                _this6.setState({ products: productsArray, currentProduct: null });
             });
         }
     }, {
@@ -44584,27 +44705,86 @@ var Main = function (_Component) {
     }, {
         key: 'handleUpdate',
         value: function handleUpdate(product) {
-            var _this6 = this;
+            var _this7 = this;
+
+            product.user_interface = Number(product.user_interface);
+            product.speed_size = Number(product.speed_size);
+            product.software = Number(product.software);
+            product.support = Number(product.support);
+            product.administration = Number(product.administration);
+            product.rating = Number(product.rating);
+            product.availability = Number(product.availability);
+
+            console.log(product);
+
+            var formData = new FormData();
+
+            formData.append("title", product.title);
+
+            if (product.image.name) {
+                formData.append("image", product.image, product.image.name);
+            } else {
+                formData.append("image", "");
+            }
+
+            formData.append("description", product.description);
+            formData.append("user_interface", product.user_interface);
+            formData.append("speed_size", product.speed_size);
+            formData.append("software", product.software);
+            formData.append("support", product.support);
+            formData.append("administration", product.administration);
+            formData.append("rating", product.rating);
+            formData.append("availability", product.availability);
+
+            // Log FormData
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = formData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var pair = _step.value;
+
+                    console.log(pair[0] + ', ' + pair[1]);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
 
             var currentProduct = this.state.currentProduct;
 
-            fetch('api/products/' + currentProduct.id + '?token=' + this.state.token, {
-                method: 'put',
+            __WEBPACK_IMPORTED_MODULE_9_axios___default()({
+                method: 'post',
+                url: 'api/products/' + currentProduct.id + '?_method=PUT',
+                data: formData,
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(product)
+                    'Accept': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + this.state.token
+                }
             }).then(function (response) {
-                return response.json();
+                return response;
             }).then(function (data) {
-                _this6.setState(function (prevState) {
+                _this7.setState(function (prevState) {
                     return {
                         products: prevState.products.map(function (productObj) {
                             return productObj.id === currentProduct.id ? Object.assign(productObj, product) : productObj;
                         })
                     };
                 });
+            }).catch(function (error) {
+                console.log(formData + ' ' + error);
             });
 
             this.setState({ editBtnClicked: false });
@@ -44612,15 +44792,18 @@ var Main = function (_Component) {
     }, {
         key: '_loginUser',
         value: function _loginUser(email, password) {
-            var _this7 = this;
+            var _this8 = this;
 
             __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
 
             var formData = new FormData();
             formData.append("email", email);
             formData.append("password", password);
+            formData.append("token_expire", this.setTokenExpire());
 
             __WEBPACK_IMPORTED_MODULE_9_axios___default.a.post("api/user/login/", formData).then(function (response) {
+                console.log(response);
+
                 return response;
             }).then(function (json) {
                 if (json.data.success) {
@@ -44629,6 +44812,7 @@ var Main = function (_Component) {
                         id: json.data.data.id,
                         email: json.data.data.email,
                         auth_token: json.data.data.auth_token,
+                        token_expire: json.data.data.token_expire,
                         timestamp: new Date().toString()
                     };
 
@@ -44637,13 +44821,16 @@ var Main = function (_Component) {
                         user: userData
                     };
 
+                    console.log(userData);
+
                     localStorage["appState"] = JSON.stringify(appState);
 
-                    _this7.setState({
+                    _this8.setState({
                         isLoggedIn: appState.isLoggedIn,
                         user: appState.user,
                         token: appState.user.auth_token
                     });
+                    console.log('Test');
                 } else {
                     alert("Login Failed!");
                 }
@@ -44656,7 +44843,7 @@ var Main = function (_Component) {
     }, {
         key: '_registerUser',
         value: function _registerUser(name, email, password) {
-            var _this8 = this;
+            var _this9 = this;
 
             __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").attr("disabled", "disabled").html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>');
 
@@ -44665,9 +44852,9 @@ var Main = function (_Component) {
             formData.append("name", name);
             formData.append("email", email);
             formData.append("password", password);
+            formData.append("token_expire", this.setTokenExpire());
 
             __WEBPACK_IMPORTED_MODULE_9_axios___default.a.post("api/user/register", formData).then(function (response) {
-
                 return response;
             }).then(function (json) {
                 if (json.data[0].success) {
@@ -44676,6 +44863,7 @@ var Main = function (_Component) {
                         id: json.data[0].data.id,
                         email: json.data[0].data.email,
                         auth_token: json.data[0].data.auth_token,
+                        token_expire: json.data[0].data.token_expire,
                         timestamp: new Date().toString()
                     };
 
@@ -44686,7 +44874,7 @@ var Main = function (_Component) {
 
                     localStorage["appState"] = JSON.stringify(appState);
 
-                    _this8.setState({
+                    _this9.setState({
                         isLoggedIn: appState.isLoggedIn,
                         user: appState.user
                     });
@@ -44702,6 +44890,13 @@ var Main = function (_Component) {
             });
         }
     }, {
+        key: 'setTokenExpire',
+        value: function setTokenExpire() {
+            var currentDate = new Date();
+            var tokenExpire = new Date(currentDate.getTime() + 1000 * 60 * 60);
+            return tokenExpire;
+        }
+    }, {
         key: '_logoutUser',
         value: function _logoutUser() {
             var appState = {
@@ -44712,36 +44907,50 @@ var Main = function (_Component) {
 
             localStorage["appState"] = JSON.stringify(appState);
             this.setState(appState);
+            this.setState({ newReviewForm: false, editBtnClicked: false });
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this9 = this;
+            var _this10 = this;
 
             var divStyle = {
                 height: '100%',
                 background: '#f0f0f0',
-                padding: '10px 30px',
-                margin: '30px'
+                padding: '10px 15px',
+                margin: '30px 0 30px 0'
             };
 
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'div',
                 null,
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'nav',
+                    { className: 'navbar text-center', style: { background: '#424242', borderBottom: '2px solid #3097D1', borderRadius: '0' } },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'h1',
+                        { style: { color: '#fff', margin: '20px 0 25px' } },
+                        'OS Reviews ',
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-laptop', 'aria-hidden': 'true' })
+                    )
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
                     { className: 'row margin-0' },
-                    this.state.editBtnClicked === false ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'div',
-                        { className: 'col-xs-12 col-md-5 col-md-push-3 padding-0' },
+                        { className: 'col-xs-12 col-md-5 col-md-push-3' },
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'div',
                             { className: 'row margin-0' },
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'div',
-                                { className: 'col-md-12 padding-0' },
+                                { className: 'col-md-12' },
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__Product__["a" /* default */], {
+                                    renderNewProducts: this.renderNewProducts,
                                     product: this.state.currentProduct,
+                                    newReviewForm: this.state.newReviewForm,
+                                    editBtnClicked: this.state.editBtnClicked,
                                     deleteProduct: this.handleDeleteProduct,
                                     handleDeleteConfirm: this.handleDeleteConfirm,
                                     handleEdit: this.handleEdit,
@@ -44755,45 +44964,24 @@ var Main = function (_Component) {
                             { className: 'row margin-0' },
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'div',
-                                { className: 'col-md-12 padding-0' },
-                                this.state.token ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                { className: 'col-md-12' },
+                                this.state.token && this.state.newReviewForm ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'div',
-                                    null,
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                                    { style: { height: '100vh' } },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__AddProduct__["a" /* default */], { onAdd: this.handleAddProduct })
                                 ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
-                            )
-                        )
-                    ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        'div',
-                        { className: 'col-xs-12 col-md-5 col-md-push-3 padding-0' },
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__EditProduct__["a" /* default */], {
-                            product: this.state.currentProduct,
-                            update: this.handleUpdate
-                        })
-                    ),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        'div',
-                        { className: 'col-xs-12 col-md-3 col-md-pull-5 padding-0' },
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            'div',
-                            { style: divStyle },
+                            ),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'div',
-                                null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    'h3',
+                                { className: 'col-md-12' },
+                                this.state.token && this.state.editBtnClicked ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
                                     null,
-                                    'All reviews (',
-                                    this.state.products.length,
-                                    ')'
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { borderColor: '#e0e0e0' } }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    'ul',
-                                    null,
-                                    this.renderProducts()
-                                )
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__EditProduct__["a" /* default */], {
+                                        product: this.state.currentProduct,
+                                        update: this.handleUpdate
+                                    })
+                                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
                             )
                         )
                     ),
@@ -44803,25 +44991,119 @@ var Main = function (_Component) {
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_react_router_dom__["c" /* Route */], {
                             path: '/login',
                             render: function render(props) {
-                                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__Login__["a" /* default */], _extends({}, props, { loginUser: _this9._loginUser }));
+                                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__Login__["a" /* default */], _extends({}, props, { loginUser: _this10._loginUser }));
                             }
                         }),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_react_router_dom__["c" /* Route */], {
                             path: '/register',
                             render: function render(props) {
-                                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6__Register__["a" /* default */], _extends({}, props, { registerUser: _this9._registerUser }));
+                                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6__Register__["a" /* default */], _extends({}, props, { registerUser: _this10._registerUser }));
                             }
                         }),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_react_router_dom__["c" /* Route */], { exact: true, path: '/', render: function render(props) {
                                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'div',
-                                    { className: 'col-xs-12 col-md-4 padding-0' },
+                                    { className: 'col-xs-12 col-md-4 col-md-push-3' },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_8__Home__["a" /* default */], _extends({}, props, {
-                                        logoutUser: _this9._logoutUser,
-                                        user: _this9.state.user
+                                        logoutUser: _this10._logoutUser,
+                                        renderReviewForm: _this10.renderReviewForm,
+                                        user: _this10.state.user,
+                                        products: _this10.state.products
                                     }))
                                 );
                             } })
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { className: 'reorder-xs' },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'div',
+                            { className: 'col-xs-12 col-md-4 col-md-push-3' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                { className: 'panel panel-default', style: { margin: '15px' } },
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
+                                    { className: 'panel-heading', style: { backgroundColor: '#f5f5f5' } },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'h2',
+                                        { className: 'text-center' },
+                                        'About'
+                                    )
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
+                                    { className: 'panel-body text-center' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'p',
+                                        null,
+                                        'View and post reviews on computer Operating Systems with a calculated overall star rating out of 5 based on UI, speed/size, software, support and administration.'
+                                    )
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
+                                    { className: 'panel-footer' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'h4',
+                                        { className: 'text-center' },
+                                        'Developed by Brandon Winger-Air'
+                                    ),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'h5',
+                                        { className: 'text-center' },
+                                        'OS Reviews \xA9 2019'
+                                    )
+                                )
+                            ),
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'h4',
+                                { className: 'text-center' },
+                                'Need a free operating system?'
+                            ),
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                { style: { textAlign: 'center', margin: '30px 0' } },
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png', width: '80%', style: { border: '1px solid #9e9e9e', borderRadius: '3px' } })
+                            )
+                        ),
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'div',
+                            { id: 'all-reviews', className: 'col-xs-12 col-md-3 col-md-pull-9' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'div',
+                                null,
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'div',
+                                    null,
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'div',
+                                        { className: 'panel panel-default', style: { margin: '15px' } },
+                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                            'div',
+                                            { className: 'panel-heading', style: { backgroundColor: '#f5f5f5' } },
+                                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                                'h3',
+                                                null,
+                                                'All Reviews (',
+                                                this.state.products.length,
+                                                ')'
+                                            )
+                                        ),
+                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                            'div',
+                                            null,
+                                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                                'ul',
+                                                { className: 'list-group', style: { marginBottom: '0' } },
+                                                this.renderProducts()
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
                     )
                 )
             );
@@ -58115,10 +58397,15 @@ module.exports = hoistNonReactStatics;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 var Product = function Product(props) {
-  var product = props.product,
+  var renderNewProducts = props.renderNewProducts,
+      product = props.product,
+      newReviewForm = props.newReviewForm,
+      editBtnClicked = props.editBtnClicked,
       handleEdit = props.handleEdit,
       update = props.update,
       deleteProduct = props.deleteProduct,
@@ -58127,13 +58414,31 @@ var Product = function Product(props) {
       user = props.user;
 
 
-  var divStyle = {
+  var divStyle = _defineProperty({
     height: '100%',
-    marginLeft: '20px',
+    marginLeft: '30px',
     marginTop: '30px'
+  }, 'height', '100vh');
+
+  var reviewStars = function reviewStars(star) {
+    star = Math.round(star);
+
+    var stars = [];
+
+    for (var i = 0; i < star; i++) {
+      stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'li',
+        { key: i },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#fdd835' } })
+      ));
+    }
+
+    return stars;
   };
 
-  if (!product) {
+  var renderThumbs = true;
+
+  if (!product && !newReviewForm && !editBtnClicked) {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       { style: divStyle },
@@ -58141,54 +58446,187 @@ var Product = function Product(props) {
         'h2',
         null,
         'No review selected.'
+      ),
+      token ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'p',
+        null,
+        'Log in to post a review'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { borderColor: '#e0e0e0', margin: '20px 0' } }),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'panel panel-default text-center', style: { margin: '15px' } },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'panel-heading', style: { backgroundColor: '#f5f5f5' } },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h3',
+            null,
+            'Latest Reviews'
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'ul',
+            { className: 'list-group', style: { marginBottom: '0' } },
+            renderNewProducts(5, renderThumbs)
+          )
+        )
       )
     );
+  } else if (newReviewForm || editBtnClicked) {
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null);
   }
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'div',
-    { style: divStyle, className: 'list-group' },
+    { style: divStyle },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      { className: 'panel panel-primary' },
+      { className: 'panel panel-primary text-center', style: { background: '#616161', color: '#fff' } },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h2',
-        { className: 'list-group-item-heading text-center' },
+        { className: 'list-group-item-heading' },
         product.title
       )
     ),
+    product.image ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: "http://localhost:8000/" + product.image, alt: '', className: 'img-responsive img-thumbnail center-block', style: { width: '80%', height: '370px', marginTop: '30px' } }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'h4',
       { className: 'text-center' },
-      'Reviewed by: ',
+      'Posted by: ',
       product.posted_by
     ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { width: '50%' } }),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { className: 'text-center', style: { width: '50%' } }),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      { className: 'list-group-item', style: { paddingLeft: '30px' } },
+      { className: 'list-group-item text-center' },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'h3',
+        'ul',
+        { className: 'list-unstyled list-inline' },
+        reviewStars(product.rating)
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
         null,
-        'Status: ',
-        product.availability ? 'Available' : 'Out of stock'
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Version:'
+        ),
+        ' ',
+        product.description
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h3',
         null,
-        'Price: $',
-        product.price
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Recommended:'
+        ),
+        product.availability ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-thumbs-up text-success', 'aria-hidden': 'true' }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-thumbs-down text-danger', 'aria-hidden': 'true' })
       ),
-      user && product.posted_by === user.name ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Support:'
+        ),
+        ' ',
+        product.user_interface,
+        ' / 5'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Support:'
+        ),
+        ' ',
+        product.speed_size,
+        ' / 5'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Support:'
+        ),
+        ' ',
+        product.software,
+        ' / 5'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Support:'
+        ),
+        ' ',
+        product.support,
+        ' / 5'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'b',
+          null,
+          'Support:'
+        ),
+        ' ',
+        product.administration,
+        ' / 5'
+      ),
+      product.posted_by === user.name ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
         null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-info', type: 'button', value: 'Edit', onClick: function onClick(e) {
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-info', style: { margin: '0 10px' }, type: 'button', value: 'Edit', onClick: function onClick(e) {
             return handleEdit();
           } }),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-danger', type: 'button', value: 'Delete', onClick: function onClick(e) {
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-danger', style: { margin: '0 10px' }, type: 'button', value: 'Delete', onClick: function onClick(e) {
             return handleDeleteConfirm();
           } })
       ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
+    ),
+    product.image ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'panel panel-default text-center', style: { margin: '15px' } },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'panel-heading', style: { backgroundColor: '#f5f5f5' } },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h3',
+            null,
+            'Latest Reviews'
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'ul',
+            { className: 'list-group', style: { marginBottom: '0' } },
+            renderNewProducts(5)
+          )
+        )
+      )
     )
   );
 };
@@ -58225,13 +58663,19 @@ var AddProduct = function (_Component) {
         id: '',
         title: '',
         description: '',
-        price: 0,
+        user_interface: 5,
+        speed_size: 5,
+        software: 5,
+        support: 5,
+        administration: 5,
+        rating: 5,
         availability: 1
       }
     };
 
     _this.handleSubmit = _this.handleSubmit.bind(_this);
     _this.handleInput = _this.handleInput.bind(_this);
+    _this.handleRating = _this.handleRating.bind(_this);
     return _this;
   }
 
@@ -58239,7 +58683,25 @@ var AddProduct = function (_Component) {
     key: 'handleInput',
     value: function handleInput(key, e) {
       var state = Object.assign({}, this.state.newProduct);
-      state[key] = e.target.value;
+
+      if (e.target.type === "select-one") {
+        state[key] = parseInt(e.target.value);
+      } else if (e.target.type === "file") {
+        state[key] = e.target.files[0];
+      } else {
+        state[key] = e.target.value;
+      }
+
+      this.setState({ newProduct: state });
+    }
+  }, {
+    key: 'handleRating',
+    value: function handleRating(key, e) {
+      var state = Object.assign({}, this.state.newProduct);
+      state[key] = parseFloat(e.target.value);
+
+      state.rating = (state.user_interface + state.speed_size + state.software + state.support + state.administration) / 5;
+
       this.setState({ newProduct: state });
     }
   }, {
@@ -58254,8 +58716,8 @@ var AddProduct = function (_Component) {
       var _this2 = this;
 
       var divStyle = {
-        marginLeft: '20px',
-        marginRight: '20px'
+        marginLeft: '30px',
+        marginRight: '30px'
       };
 
       var createPriceStyle = {
@@ -58275,7 +58737,7 @@ var AddProduct = function (_Component) {
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'form',
-            { onSubmit: this.handleSubmit },
+            { onSubmit: this.handleSubmit, encType: 'multipart/form-data' },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'div',
               { className: 'form-group' },
@@ -58294,23 +58756,203 @@ var AddProduct = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'label',
                 null,
-                'Description:'
+                'Image:'
               ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('textarea', { className: 'form-control', type: 'text', onChange: function onChange(e) {
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'file', onChange: function onChange(e) {
+                  return _this2.handleInput('image', e);
+                } })
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'form-group' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'label',
+                null,
+                'Version:'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control', type: 'text', onChange: function onChange(e) {
                   return _this2.handleInput('description', e);
                 } })
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'div',
-              { className: 'form-group', style: createPriceStyle },
+              'label',
+              null,
+              'User Interface'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'select',
+              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+                  return _this2.handleRating('user_interface', e);
+                } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'label',
+                'option',
                 null,
-                'Price:'
+                '1'
               ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control', type: 'number', onChange: function onChange(e) {
-                  return _this2.handleInput('price', e);
-                } })
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '2'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '3'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '4'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '5'
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'label',
+              null,
+              'Speed/Size'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'select',
+              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+                  return _this2.handleRating('speed_size', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '1'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '2'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '3'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '4'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '5'
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'label',
+              null,
+              'Software'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'select',
+              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+                  return _this2.handleRating('software', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '1'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '2'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '3'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '4'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '5'
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'label',
+              null,
+              'Administration'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'select',
+              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+                  return _this2.handleRating('administration', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '1'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '2'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '3'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '4'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '5'
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'label',
+              null,
+              'Support'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'select',
+              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+                  return _this2.handleRating('support', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '1'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '2'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '3'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '4'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'option',
+                null,
+                '5'
+              )
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'div',
@@ -58318,7 +58960,7 @@ var AddProduct = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'label',
                 null,
-                'Availability:'
+                'Would you recommend?'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'select',
@@ -58328,12 +58970,12 @@ var AddProduct = function (_Component) {
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   'option',
                   { value: '1' },
-                  'Available'
+                  'Yes'
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   'option',
                   { value: '0' },
-                  'Out of stock'
+                  'No'
                 )
               )
             ),
@@ -58384,26 +59026,49 @@ var EditProduct = function (_Component) {
   }
 
   _createClass(EditProduct, [{
-    key: 'componentWillMount',
+    key: "componentWillMount",
     value: function componentWillMount() {
       this.setState({ product: this.props.product });
     }
   }, {
-    key: 'handleInput',
+    key: "handleInput",
     value: function handleInput(key, e) {
       var state = Object.assign({}, this.state.product);
-      state[key] = e.target.value;
+
+      if (e.target.type === "select-one") {
+        state[key] = parseInt(e.target.value);
+      } else if (e.target.type === "file") {
+        state[key] = e.target.files[0];
+      } else {
+        state[key] = e.target.value;
+      }
+
       this.setState({ product: state });
     }
   }, {
-    key: 'handleSubmit',
+    key: "handleRating",
+    value: function handleRating(key, e) {
+      var state = Object.assign({}, this.state.product);
+      state[key] = parseFloat(e.target.value);
+
+      state.rating = (state.user_interface + state.speed_size + state.software + state.support + state.administration) / 5;
+
+      this.setState({ product: state });
+    }
+  }, {
+    key: "handleSubmit",
     value: function handleSubmit(e) {
       e.preventDefault();
+
+      if (!this.state.product.image) {
+        this.state.product.image = {};
+      }
+
       this.props.update(this.state.product);
       this.editForm.reset();
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _this2 = this;
 
@@ -58411,10 +59076,9 @@ var EditProduct = function (_Component) {
 
       var divStyle = {
         position: 'inline-block',
-        marginTop: '30px',
+        margin: '30px',
         flexDirection: 'space-between',
-        marginLeft: '30px',
-        width: '40vw'
+        marginLeft: '30px'
       };
 
       var editPriceStyle = {
@@ -58422,36 +59086,38 @@ var EditProduct = function (_Component) {
       };
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'div',
+        "div",
         { style: divStyle },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'h2',
+          "h2",
           null,
-          'Edit Product'
+          "Edit Product"
         ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("hr", null),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'div',
+          "div",
           null,
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'form',
+            "form",
             {
               onSubmit: this.handleSubmit,
               ref: function ref(input) {
                 return _this2.editForm = input;
-              }
+              },
+              encType: "multipart/form-data"
             },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'div',
-              { className: 'form-group' },
+              "div",
+              { className: "form-group" },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'label',
-                { htmlFor: 'title' },
-                'Title:'
+                "label",
+                { htmlFor: "title" },
+                "Title:"
               ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-                className: 'form-control',
-                type: 'text',
-                name: 'title',
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", {
+                className: "form-control",
+                type: "text",
+                name: "title",
                 value: product.title,
                 onChange: function onChange(e) {
                   return _this2.handleInput("title", e);
@@ -58459,17 +59125,29 @@ var EditProduct = function (_Component) {
               })
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'div',
-              { className: 'form-group' },
+              "div",
+              { className: "form-group" },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'label',
-                { htmlFor: 'description' },
-                'Description:'
+                "label",
+                null,
+                "Image:"
               ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('textarea', {
-                className: 'form-control',
-                rows: '4',
-                name: 'description',
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "file", name: "image", onChange: function onChange(e) {
+                  return _this2.handleInput('image', e);
+                } })
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "form-group" },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "label",
+                { htmlFor: "description" },
+                "Version:"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", {
+                className: "form-control",
+                type: "text",
+                name: "description",
                 value: product.description,
                 onChange: function onChange(e) {
                   return _this2.handleInput("description", e);
@@ -58477,49 +59155,211 @@ var EditProduct = function (_Component) {
               })
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'div',
-              { className: 'form-group', style: editPriceStyle },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'label',
-                { htmlFor: 'price' },
-                'Price:'
-              ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-                className: 'form-control',
-                type: 'text',
-                name: 'price',
-                value: product.price,
-                onChange: function onChange(e) {
-                  return _this2.handleInput("price", e);
-                }
-              })
+              "label",
+              null,
+              "User Interface"
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              'div',
-              { className: 'form-group', style: editPriceStyle },
+              "select",
+              { className: "form-control", style: editPriceStyle, type: "number", name: "user_interface", onChange: function onChange(e) {
+                  return _this2.handleRating('user_interface', e);
+                } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'label',
+                "option",
                 null,
-                'Availability:'
+                "1"
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'select',
-                { className: 'form-control', value: product.availability, onChange: function onChange(e) {
+                "option",
+                null,
+                "2"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "3"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "4"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "5"
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "label",
+              null,
+              "Speed/Size"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "select",
+              { className: "form-control", style: editPriceStyle, type: "number", name: "speed_size", onChange: function onChange(e) {
+                  return _this2.handleRating('speed_size', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "1"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "2"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "3"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "4"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "5"
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "label",
+              null,
+              "Software"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "select",
+              { className: "form-control", style: editPriceStyle, type: "number", name: "software", onChange: function onChange(e) {
+                  return _this2.handleRating('software', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "1"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "2"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "3"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "4"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "5"
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "label",
+              null,
+              "Administration"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "select",
+              { className: "form-control", style: editPriceStyle, type: "number", name: "administration", onChange: function onChange(e) {
+                  return _this2.handleRating('administration', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "1"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "2"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "3"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "4"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "5"
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "label",
+              null,
+              "Support"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "select",
+              { className: "form-control", style: editPriceStyle, type: "number", name: "support", onChange: function onChange(e) {
+                  return _this2.handleRating('support', e);
+                } },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "1"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "2"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "3"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "4"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "option",
+                null,
+                "5"
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "form-group", style: editPriceStyle },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "label",
+                null,
+                "Would you recommend?"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "select",
+                { className: "form-control", value: product.availability, name: "availability", onChange: function onChange(e) {
                     return _this2.handleInput('availability', e);
                   } },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  'option',
-                  { value: '1' },
-                  'Available'
+                  "option",
+                  { value: "1" },
+                  "Yes"
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  'option',
-                  { value: '0' },
-                  'Out of stock'
+                  "option",
+                  { value: "0" },
+                  "No"
                 )
               )
             ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'btn btn-primary', type: 'submit', value: 'Submit' })
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { className: "btn btn-primary", type: "submit", value: "Submit" })
           )
         )
       );
@@ -58565,7 +59405,7 @@ var Register = function Register(_ref) {
     { id: "main" },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "div",
-      { className: "col-md-4 padding-0" },
+      { className: "col-xs-12 col-md-4 col-md-push-3" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "form",
         { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center", style: { border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' } },
@@ -58646,39 +59486,46 @@ var Login = function Login(_ref) {
     { id: "main" },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "div",
-      { className: "col-xs-12 col-md-4 padding-0" },
+      { className: "col-xs-12 col-md-4 col-md-push-3" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "form",
-        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center", style: { border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' } },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "h3",
-          { style: { boxSizing: 'border-box', margin: 0, padding: '25px', background: '#f5f5f5 ' } },
-          "Login"
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("hr", { style: { marginTop: 0, borderColor: '#e0e0e0' } }),
+        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "panel panel-default text-center" },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "form-group" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-              return _email = input;
-            }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email", style: inputStyle })
+          { className: "panel-heading", style: { backgroundColor: '#f5f5f5' } },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "h3",
+            null,
+            "User Login"
+          )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "form-group" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-              return _password = input;
-            }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password", style: inputStyle })
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "button",
-          { type: "submit", className: "btn btn-primary center-block email-login-btn", style: { margin: '20px auto 10px' }, href: "#!" },
-          "Login"
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-          { to: "/register" },
-          "Register"
+          { className: "panel-body" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "form-group" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+                return _email = input;
+              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email", style: inputStyle })
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "form-group" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+                return _password = input;
+              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password", style: inputStyle })
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "button",
+            { type: "submit", className: "btn btn-primary center-block email-login-btn", style: { margin: '20px auto 10px' }, href: "#!" },
+            "Login"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
+            { to: "/register" },
+            "Register"
+          )
         )
       )
     )
@@ -58728,15 +59575,59 @@ var Home = function (_React$Component) {
   }
 
   _createClass(Home, [{
+    key: "renderUserReviews",
+    value: function renderUserReviews() {
+      var _this2 = this;
+
+      var listStyle = {
+        listStyle: 'none',
+        fontSize: '18px',
+        lineHeight: '1.8em',
+        borderRadius: '0'
+      };
+
+      return this.props.products.filter(function (product) {
+        if (product.posted_by === _this2.state.user.name) {
+          return product;
+        }
+      }).map(function (product) {
+        var listStyle = {
+          listStyle: 'none',
+          fontSize: '18px',
+          lineHeight: '1.8em',
+          paddingLeft: '1em'
+        };
+
+        var newKey = product.title + " (User)";
+
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "li",
+          {
+            className: "list-group-item",
+            style: listStyle,
+            onClick: function onClick() {
+              return _this2.handleClick(product);
+            },
+            key: newKey
+          },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "h4",
+            { style: { display: 'inline-block', marginRight: '5px' } },
+            product.title
+          )
+        );
+      });
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      var _this2 = this;
+      var _this3 = this;
 
       __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get("api/user/home?token=" + this.state.token).then(function (response) {
         return response;
       }).then(function (json) {
         if (json.data.success) {
-          _this2.setState({ user: json.data.data });
+          _this3.setState({ user: json.data.data });
         } else alert("Login Failed!");
       }).catch(function (error) {
         alert("An Error Occurred! " + error);
@@ -58751,13 +59642,7 @@ var Home = function (_React$Component) {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "h2",
           null,
-          "Welcome Home ",
-          "\u2728"
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "p",
-          null,
-          "Dashboard"
+          "Dashboard \uD83C\uDFE0"
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
@@ -58766,10 +59651,29 @@ var Home = function (_React$Component) {
             "div",
             { className: "panel-body" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "p",
+              "h4",
               null,
               "Username: ",
               this.state.user.name
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "button",
+              {
+                className: "btn btn-success",
+                onClick: this.props.renderReviewForm,
+                style: { margin: '0 auto' }
+              },
+              "New Review"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "h4",
+              null,
+              "My Reviews:"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "ul",
+              null,
+              this.renderUserReviews()
             )
           )
         ),
@@ -58777,7 +59681,8 @@ var Home = function (_React$Component) {
           "button",
           {
             className: "btn btn-info",
-            onClick: this.props.logoutUser
+            onClick: this.props.logoutUser,
+            style: { marginBottom: '20px' }
           },
           "Logout",
           " "

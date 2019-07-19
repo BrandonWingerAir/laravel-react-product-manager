@@ -39,10 +39,12 @@ class UserController extends Controller
         {
             $token = self::getToken($request->email, $request->password);
             $user->auth_token = $token;
+            $user->token_expire = $request->token_expire;
             $user->save();
             $response = ['success' => true, 'data' => [
                 'id' => $user->id, 
                 'auth_token' => $user->auth_token,
+                'token_expire' => $user->token_expire,
                 'name' => $user->name,
                 'email' => $user->email,
             ]];
@@ -59,7 +61,8 @@ class UserController extends Controller
             'password' => \Hash::make($request->password),
             'email' => $request->email,
             'name' => $request->name,
-            'auth_token' => ''
+            'auth_token' => '',
+            'token_expire' => $request->token_expire
         ];
 
         $user = new \App\User($payload);
@@ -77,7 +80,7 @@ class UserController extends Controller
             
             $response = [
                 ['success' => true, 'data' => [
-                    'name' => $user->name, 'id' => $user->id, 'email' => $request->email, 'auth_token' => $token
+                    'name' => $user->name, 'id' => $user->id, 'email' => $request->email, 'auth_token' => $token, 'token_expire' => $user->token_expire
                 ]]
             ];
         }

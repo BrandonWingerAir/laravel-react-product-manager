@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class ProductsController extends Controller
 {
@@ -33,8 +34,15 @@ class ProductsController extends Controller
             'availability'  => 'boolean'
         ]);
         
+        $request->image->store('public/images');
+        $path = 'storage/images/' .$request->image->hashName();
+
         $product = Product::create($request->all() + ['posted_by' => Auth::user()->name]);
+        $product->image = $path;
+        $product->save();
+
         return response()->json($product, 201);
+        
     }
 
     /**
@@ -52,13 +60,30 @@ class ProductsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
-    {
-        $product->update($request->all());
-        return response()->json($product, 200);
+    public function update(Request $request, $id)
+    {   
+        $product = Product::findOrFail($id);
+
+        // str_replace on WINDOWS ONLY (Change for other OS)
+        $productImg = str_replace('\\', '/', public_path($product->image));
+
+        if($request->hasFile('image')) {
+            if (File::exists($productImg)) {
+                unlink($productImg);
+            }
+
+            $request->image->store('public/images');
+            $path = 'storage/images/' . $request->image->hashName();
+        }
+
+        $data = $request->all();
+        $data['image'] = $path;
+        
+        $product->update($data);
+
+        return response()->json($productImg, 200);
     }
 
     /**

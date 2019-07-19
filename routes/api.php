@@ -27,7 +27,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => ['jwt.auth', 'api-header']], function() {
   Route::post('products', 'ProductsController@store');
-  Route::put('products/{product}', 'ProductsController@update');
+  Route::put('products/{id}', 'ProductsController@update');
   Route::delete('products/{product}', 'ProductsController@delete');
 
   Route::get('user/home', function() {

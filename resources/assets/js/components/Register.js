@@ -13,7 +13,7 @@ const Register = ({ history, registerUser = f => f }) => {
 
   return (
     <div id="main">
-      <div className="col-md-4 padding-0">
+      <div className="col-xs-12 col-md-4 col-md-push-3">
         <form action="" id="login-form" onSubmit={handleLogin} method="post" className="text-center" style={{ border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' }}>
           <h3 style={{ boxSizing: 'border-box', margin: 0, padding: '25px', background: '#f5f5f5 ' }}>
             Register

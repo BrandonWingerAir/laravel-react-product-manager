@@ -10,8 +10,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     </head>
     <body>
-        <h1 class="text-center">OS Review <i class="fa fa-laptop" aria-hidden="true"></i></h1>
-        <hr>
         <div id="root"></div>
 
         <script src="{{mix('js/app.js')}}" ></script>

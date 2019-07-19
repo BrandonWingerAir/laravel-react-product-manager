@@ -18,16 +18,21 @@ export default class Main extends Component {
         this.state = {
             products: [],
             currentProduct: null,
+            newReviewForm: false,
             editBtnClicked: false,
             isLoggedIn: localStorage["appState"]
             ? JSON.parse(localStorage["appState"]).isLoggedIn
             : false,
-            user: {},
+            user: localStorage["appState"]
+            ? (localStorage["appState"]).user
+            : {},
             token: localStorage["appState"]
                 ? JSON.parse(localStorage["appState"]).user.auth_token
                 : ""
         }
 
+        this.renderNewProducts = this.renderNewProducts.bind(this);
+        this.renderReviewForm = this.renderReviewForm.bind(this);
         this.handleAddProduct = this.handleAddProduct.bind(this);
         this.handleDeleteProduct = this.handleDeleteProduct.bind(this);
         this.handleDeleteConfirm = this.handleDeleteConfirm.bind(this);
@@ -69,10 +74,13 @@ export default class Main extends Component {
 
         let state = localStorage["appState"];
 
-        if (state) {
-            let storedState = JSON.parse(state);
-            this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });
-        }
+        let storedState = JSON.parse(state);
+
+        if (Date.parse(new Date()) < Date.parse(storedState.user.token_expire)) {
+            this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });            
+        } else {            
+            this.setState({ isLoggedIn: false, user: {}, token: '' });
+        }        
     }
 
     renderProducts() {
@@ -80,46 +88,154 @@ export default class Main extends Component {
             listStyle: 'none',
             fontSize: '18px',
             lineHeight: '1.8em',
-            paddingLeft: '1em'
+            paddingLeft: '1em',
+            borderRadius: '0',
+            borderLeft: '0',
+            borderRight: '0'
         }
 
         return this.state.products.map((product) => {
             return (
-                <li 
+                <li
+                    className="list-group-item"
                     style={listStyle} 
                     onClick={() =>this.handleClick(product)} 
-                    key={product.id}
+                    key={product.title}
                 >
-                    {product.title} 
+                    <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4> 
+                    <b>
+                        {Math.round(product.rating)}
+                        <span 
+                            className="fa fa-star" 
+                            aria-hidden="true" 
+                            style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
+                        ></span>
+                    </b>
                 </li>
             );
         });
     }
 
+    renderNewProducts(limit, renderThumbs) {
+        const listStyle = {
+            listStyle: 'none',
+            fontSize: '18px',
+            lineHeight: '1.8em',
+            borderRadius: '0'
+        }
+
+        const reviewStars = (star) => {
+            var stars = [];
+
+            for (var i = 0; i < star; i++) {
+                stars.push(
+                <li key={i}>
+                    <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+                </li>
+                );
+            }
+        
+            return stars;
+        }
+
+        return this.state.products.slice(0).reverse().slice(0, limit).map((product) => {
+            var newKey = `${product.title} (New)`;
+
+            return (
+                <li 
+                    className="list-group-item"
+                    style={listStyle}
+                    onClick={() =>this.handleClick(product)} 
+                    key={newKey}
+                >
+                    <h4 style={{ display: 'inline-block' }}>{product.title}</h4 >
+
+                    { renderThumbs ? (
+                        <div style={{ display: 'inline-block' }}>
+                            {
+                                product.availability 
+                                ? <i className="fa fa-thumbs-up text-success" style={{ marginLeft: '10px' }} aria-hidden="true"></i>
+                                : <i className="fa fa-thumbs-down text-danger" style={{ marginLeft: '10px' }} aria-hidden="true"></i>
+                            }
+                        </div>
+                    ) : (
+                        <div>
+
+                        </div>
+                    )}
+
+                    <h5>{product.description}</h5>
+
+                    <hr style={{ width: '40%' }}/>
+
+                    <ul className="list-unstyled list-inline">
+                        {(reviewStars(product.rating))}
+                    </ul>
+                </li>
+            );
+        });
+    }
+
+    renderReviewForm() {
+        this.setState({ newReviewForm: true });
+    }
+
     handleClick(product) {
-        this.state.editBtnClicked = false
+        this.state.editBtnClicked = false;
+        this.state.newReviewForm = false;
         this.setState({ currentProduct: product });
     }
 
     handleAddProduct(product) {
-        product.price = Number(product.price);
+        product.user_interface = Number(product.user_interface);
+        product.speed_size = Number(product.speed_size);
+        product.software = Number(product.software);
+        product.support = Number(product.support);
+        product.administration = Number(product.administration);
+        product.rating = Number(product.rating);
+        product.availability = Number(product.availability);
 
-        fetch( `api/products?token=${this.state.token}`, {
+        var formData = new FormData();
+        formData.append("title", product.title);
+        formData.append("image", product.image, product.image.name);
+        formData.append("description", product.description);
+        formData.append("user_interface", product.user_interface);
+        formData.append("speed_size", product.speed_size);
+        formData.append("software", product.software);
+        formData.append("support", product.support);
+        formData.append("administration", product.administration);
+        formData.append("rating", product.rating);
+        formData.append("availability", product.availability);
+
+        console.log(product);
+        
+
+        axios({
             method:'post',
+            url: `api/products?token=${this.state.token}`,
+            data: formData,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
+                'Accept': 'multipart/form-data',
+                'Content-Type': 'multipart/form-data'
+            }
         })
         .then(response => {
-            return response.json();
+            return response;
         })
         .then( data => {
+            console.log(data);
+
+            console.log('Prev State:');
+            console.log(this.prevState);
+            
+            
             this.setState((prevState)=> ({
-                products: prevState.products.concat(data),
-                currentProduct: data
+                products: prevState.products.concat(data.data),
+                currentProduct: data.data
             }));
+
+            console.log(this.state.products);
+            
         });
     }
 
@@ -148,19 +264,56 @@ export default class Main extends Component {
         this.setState({ editBtnClicked: true });
     }
 
-    handleUpdate(product) {
+    handleUpdate(product) {    
+        product.user_interface = Number(product.user_interface);
+        product.speed_size = Number(product.speed_size);
+        product.software = Number(product.software);
+        product.support = Number(product.support);
+        product.administration = Number(product.administration);
+        product.rating = Number(product.rating);
+        product.availability = Number(product.availability);
+
+        console.log(product);
+        
+        
+        var formData = new FormData();
+
+        formData.append("title", product.title);
+        
+        if (product.image.name) {
+            formData.append("image", product.image, product.image.name);
+        } else {
+            formData.append("image", "");
+        }
+
+        formData.append("description", product.description);
+        formData.append("user_interface", product.user_interface);
+        formData.append("speed_size", product.speed_size);
+        formData.append("software", product.software);
+        formData.append("support", product.support);
+        formData.append("administration", product.administration);
+        formData.append("rating", product.rating);
+        formData.append("availability", product.availability);
+
+        // Log FormData
+        for (var pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]); 
+        }
+        
         const currentProduct = this.state.currentProduct;
 
-        fetch( `api/products/${currentProduct.id}?token=${this.state.token}`, {
-            method:'put',
+        axios({
+            method:'post',
+            url: `api/products/${currentProduct.id}?_method=PUT`,
+            data: formData,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(product)
+                'Accept': 'multipart/form-data',
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${this.state.token}`
+            }
         })
         .then(response => {
-            return response.json();
+            return response;
         })
         .then(data => {
             this.setState(prevState => ({
@@ -169,6 +322,9 @@ export default class Main extends Component {
                     Object.assign(productObj, product) : productObj
                 )
             }));
+        })
+        .catch(error => {
+            console.log(`${formData} ${error}`);
         });
 
         this.setState({ editBtnClicked: false });
@@ -184,11 +340,15 @@ export default class Main extends Component {
         var formData = new FormData();
         formData.append("email", email);
         formData.append("password", password);
+        formData.append("token_expire", this.setTokenExpire());        
 
         axios
             .post("api/user/login/", formData)
             .then(response => {
+                console.log(response);
+                
             return response;
+            
         })
         .then(json => {
             if (json.data.success) {
@@ -197,6 +357,7 @@ export default class Main extends Component {
                     id: json.data.data.id,
                     email: json.data.data.email,
                     auth_token: json.data.data.auth_token,
+                    token_expire: json.data.data.token_expire,
                     timestamp: new Date().toString()
                 };
 
@@ -205,6 +366,9 @@ export default class Main extends Component {
                     user: userData
                 }
 
+                console.log(userData);
+                
+
                 localStorage["appState"] = JSON.stringify(appState);
 
                 this.setState({
@@ -212,9 +376,12 @@ export default class Main extends Component {
                     user: appState.user,
                     token: appState.user.auth_token
                 });
+                console.log('Test');
             } else {
                 alert("Login Failed!");
             } 
+
+            
 
             $("#login-form button")
                 .removeAttr("disabled")
@@ -238,11 +405,11 @@ export default class Main extends Component {
 
         formData.append("name", name);  
         formData.append("email", email);
-        formData.append("password", password);
+        formData.append("password", password);        
+        formData.append("token_expire", this.setTokenExpire());
 
         axios.post("api/user/register", formData)
-            .then(response => {
-            
+        .then(response => {
             return response;
         })
         .then(json => {  
@@ -252,6 +419,7 @@ export default class Main extends Component {
                     id: json.data[0].data.id,
                     email: json.data[0].data.email,
                     auth_token: json.data[0].data.auth_token,
+                    token_expire: json.data[0].data.token_expire,
                     timestamp: new Date().toString()
                 };
 
@@ -282,6 +450,12 @@ export default class Main extends Component {
                 .html("Register");
         });
     };
+
+    setTokenExpire() {
+        var currentDate = new Date();
+        const tokenExpire = new Date(currentDate.getTime() + 1000 * 60 * 60);        
+        return tokenExpire;
+    }
     
     _logoutUser() {
         let appState = {
@@ -292,25 +466,34 @@ export default class Main extends Component {
 
         localStorage["appState"] = JSON.stringify(appState);
         this.setState(appState);
+        this.setState({ newReviewForm: false, editBtnClicked: false });
     };
     
     render() {
         const divStyle = {
             height: '100%',
             background: '#f0f0f0',
-            padding: '10px 30px',
-            margin: '30px'
+            padding: '10px 15px',
+            margin: '30px 0 30px 0'
         }
 
         return (
             <div>
+                <nav className="navbar text-center" style={{ background: '#424242', borderBottom: '2px solid #3097D1', borderRadius: '0' }}>
+                    <h1 style={{ color: '#fff', margin: '20px 0 25px'}}>
+                        OS Reviews <i className="fa fa-laptop" aria-hidden="true"></i>
+                    </h1>
+                </nav>
+
                 <div className="row margin-0">
-                    { this.state.editBtnClicked === false ? (
-                    <div className="col-xs-12 col-md-5 col-md-push-3 padding-0">
+                    <div className="col-xs-12 col-md-5 col-md-push-3">
                         <div className="row margin-0">
-                            <div className="col-md-12 padding-0">
+                            <div className="col-md-12">
                                 <Product 
+                                    renderNewProducts = {this.renderNewProducts}
                                     product = {this.state.currentProduct} 
+                                    newReviewForm = {this.state.newReviewForm}
+                                    editBtnClicked = {this.state.editBtnClicked}
                                     deleteProduct = {this.handleDeleteProduct}
                                     handleDeleteConfirm = {this.handleDeleteConfirm}
                                     handleEdit = {this.handleEdit}
@@ -320,34 +503,28 @@ export default class Main extends Component {
                             </div>
                         </div>
                         <div className="row margin-0">
-                            <div className="col-md-12 padding-0">
-                                { this.state.token ? (
-                                    <div>
-                                        <hr/>
+                            <div className="col-md-12">
+                                { this.state.token && this.state.newReviewForm ? (
+                                    <div style={{ height: '100vh' }}>
                                         <AddProduct onAdd={this.handleAddProduct} />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        
+                                    </div>
+                                )}
+                            </div>
+                            <div className="col-md-12">
+                                { this.state.token && this.state.editBtnClicked ? (
+                                    <div>
+                                        <EditProduct
+                                            product={this.state.currentProduct}
+                                            update={this.handleUpdate}
+                                        />
                                     </div>
                                 ) : (
                                     <div/>
                                 )}
-                            </div>
-                        </div>
-                    </div>
-                    ) : (
-                    <div className="col-xs-12 col-md-5 col-md-push-3 padding-0">
-                        <EditProduct
-                            product={this.state.currentProduct}
-                            update={this.handleUpdate}
-                        />
-                    </div>
-                    )}
-                    <div className="col-xs-12 col-md-3 col-md-pull-5 padding-0">
-                        <div style={divStyle}>
-                            <div>
-                                <h3>All reviews ({this.state.products.length})</h3>
-                                <hr style={{ borderColor: '#e0e0e0' }}/>
-                                <ul>
-                                    { this.renderProducts() }
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -364,15 +541,61 @@ export default class Main extends Component {
                         />
                         
                         <Route exact path="/" render={props => (
-                            <div className="col-xs-12 col-md-4 padding-0">
+                            <div className="col-xs-12 col-md-4 col-md-push-3">
                                 <Home
                                     {...props}
                                     logoutUser={this._logoutUser}
+                                    renderReviewForm={this.renderReviewForm}
                                     user={this.state.user}
+                                    products={this.state.products}
                                 />
                             </div>
                         )}/>
                     </Switch>
+
+                    <div className="reorder-xs">
+                        <div className="col-xs-12 col-md-4 col-md-push-3">
+                            <div className="panel panel-default" style={{ margin: '15px' }}>
+                                <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+                                    <h2 className="text-center">About</h2>
+                                </div>
+                                <div className="panel-body text-center">
+                                    <p>
+                                        View and post reviews on computer Operating Systems with a calculated overall star rating out of 5 based on UI, speed/size, software, support and administration.
+                                    </p>
+                                </div>
+                                <div className="panel-footer">
+                                    <h4 className="text-center">Developed by Brandon Winger-Air</h4>
+                                    <hr/>
+                                    <h5 className="text-center">OS Reviews &copy; 2019</h5>
+                                </div>
+                            </div>
+                            
+                            <hr/>
+
+                            <h4 className="text-center">Need a free operating system?</h4>
+                            <div style={{textAlign: 'center', margin: '30px 0'}}>
+                                <img src="https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png" width="80%" style={{ border: '1px solid #9e9e9e', borderRadius: '3px' }}/>
+                            </div>
+                        </div>
+
+                        <div id="all-reviews" className="col-xs-12 col-md-3 col-md-pull-9">
+                            <div>
+                                <div>
+                                    <div className="panel panel-default" style={{ margin: '15px' }}>
+                                        <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+                                            <h3>All Reviews ({this.state.products.length})</h3>
+                                        </div>
+                                        <div>
+                                            <ul className="list-group" style={{ marginBottom: '0' }}>
+                                                { this.renderProducts() }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
