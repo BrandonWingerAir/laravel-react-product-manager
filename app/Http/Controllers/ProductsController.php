@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 
 class ProductsController extends Controller
 {
@@ -33,13 +32,17 @@ class ProductsController extends Controller
             'price'         => 'integer',
             'availability'  => 'boolean'
         ]);
-        
-        $request->image->store('public/images');
-        $path = 'storage/images/' .$request->image->hashName();
 
-        $product = Product::create($request->all() + ['posted_by' => Auth::user()->name]);
-        $product->image = $path;
-        $product->save();
+        if ($request->hasFile('image')) {
+            $request->image->store('public/images');
+            $path = 'storage/images/' .$request->image->hashName();
+
+            $product = Product::create($request->all() + ['posted_by' => Auth::user()->name]);
+            $product->image = $path;
+            $product->save();
+        } else {
+            $product = Product::create($request->all() + ['posted_by' => Auth::user()->name]);
+        }
 
         return response()->json($product, 201);
         
@@ -66,24 +69,26 @@ class ProductsController extends Controller
     {   
         $product = Product::findOrFail($id);
 
-        // str_replace on WINDOWS ONLY (Change for other OS)
-        $productImg = str_replace('\\', '/', public_path($product->image));
-
         if($request->hasFile('image')) {
-            if (File::exists($productImg)) {
+            // str_replace on WINDOWS ONLY (Change for other OS)
+            $productImg = str_replace('\\', '/', public_path($product->image));
+
+            if (is_file($productImg)) {
                 unlink($productImg);
             }
 
             $request->image->store('public/images');
+
             $path = 'storage/images/' . $request->image->hashName();
+            $data = $request->all();
+            $data['image'] = $path;
+        } else {
+            $data = $request->all();
         }
 
-        $data = $request->all();
-        $data['image'] = $path;
-        
         $product->update($data);
 
-        return response()->json($productImg, 200);
+        return response()->json($product, 200);
     }
 
     /**

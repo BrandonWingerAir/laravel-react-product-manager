@@ -5,7 +5,7 @@ class EditProduct extends Component {
     super(props);
 
     this.state = {
-      product: null
+      product: {}
     };
 
     this.handleInput = this.handleInput.bind(this);
@@ -49,8 +49,8 @@ class EditProduct extends Component {
     e.preventDefault();
 
     if (!this.state.product.image) {
-      this.state.product.image = {};
-    }
+      this.state.product.image = null;
+    }    
 
     this.props.update(this.state.product);
     this.editForm.reset();
@@ -108,48 +108,48 @@ class EditProduct extends Component {
             </div>
 
             <label>User Interface</label>
-            <select className="form-control" style={editPriceStyle} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select className="form-control" style={editPriceStyle} value={product.user_interface} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
 
             <label>Speed/Size</label>
-            <select className="form-control" style={editPriceStyle} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select className="form-control" style={editPriceStyle} value={product.speed_size} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
 
             <label>Software</label>
-            <select className="form-control" style={editPriceStyle} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select className="form-control" style={editPriceStyle} value={product.software} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
 
             <label>Administration</label>
-            <select className="form-control" style={editPriceStyle} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select className="form-control" style={editPriceStyle} value={product.administration} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
 
             <label>Support</label>
-            <select className="form-control" style={editPriceStyle} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select className="form-control" style={editPriceStyle} value={product.support} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
             </select>
 
             <div className="form-group" style={editPriceStyle}>

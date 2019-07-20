@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Product from './Product';
 
 class AddProduct extends Component {
   constructor(props) {
@@ -89,47 +90,47 @@ class AddProduct extends Component {
             
             <label>User Interface</label>
             <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('user_interface', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option>1 (Poor)</option>
+              <option>2 (Okay)</option>
+              <option selected>3 (Good)</option>
+              <option>4 (Great)</option>
+              <option>5 (Perfect)</option>
             </select>
 
             <label>Speed/Size</label>
             <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option>1 (Poor)</option>
+              <option>2 (Okay)</option>
+              <option selected>3 (Good)</option>
+              <option>4 (Great)</option>
+              <option>5 (Perfect)</option>
             </select>
 
             <label>Software</label>
             <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('software', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option>1 (Poor)</option>
+              <option>2 (Okay)</option>
+              <option selected>3 (Good)</option>
+              <option>4 (Great)</option>
+              <option>5 (Perfect)</option>
             </select>
 
-            <label>Administration</label>
+            <label>Security</label>
             <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('administration', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option>1 (Poor)</option>
+              <option>2 (Okay)</option>
+              <option selected>3 (Good)</option>
+              <option>4 (Great)</option>
+              <option>5 (Perfect)</option>
             </select>
 
             <label>Support</label>
             <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('support', e)}>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option>1 (Poor)</option>
+              <option>2 (Okay)</option>
+              <option selected>3 (Good)</option>
+              <option>4 (Great)</option>
+              <option>5 (Perfect)</option>
             </select>
 
             <div className="form-group" style={createPriceStyle}>

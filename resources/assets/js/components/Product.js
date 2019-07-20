@@ -18,7 +18,7 @@ const Product = props => {
     height: '100%',
     marginLeft: '30px',
     marginTop: '30px',
-    height: '100vh'
+    minHeight: '100vh'
   }
 
   const reviewStars = (star) => {
@@ -50,8 +50,8 @@ const Product = props => {
 
         <hr style={{ borderColor: '#e0e0e0', margin: '20px 0' }}/>
 
-        <div className="panel panel-default text-center" style={{ margin: '15px' }}>
-          <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="panel panel-default text-center" style={{ margin: '15px', borderBottom: '0' }}>
+          <div className="panel-heading" style={{ backgroundColor: '#f5f5f5', borderBottom: '0' }}>
             <h3>Latest Reviews</h3>
           </div>
           <div>
@@ -102,15 +102,13 @@ const Product = props => {
           }
         </h3>
 
-        <h4><b>Support:</b> {product.user_interface} / 5</h4>
+        <hr style={{ width: '60%' }}/>
 
-        <h4><b>Support:</b> {product.speed_size} / 5</h4>
-
-        <h4><b>Support:</b> {product.software} / 5</h4>
-
+        <h4><b>Software:</b> {product.software} / 5</h4>
+        <h4><b>User Interface:</b> {product.user_interface} / 5</h4>
+        <h4><b>Speed/Size:</b> {product.speed_size} / 5</h4>
+        <h4><b>Security:</b> {product.administration} / 5</h4>
         <h4><b>Support:</b> {product.support} / 5</h4>
-
-        <h4><b>Support:</b> {product.administration} / 5</h4>
         
         { product.posted_by === user.name ? (
           <div>

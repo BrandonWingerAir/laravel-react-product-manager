@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\User;
 use JWTAuth;
 use JWTAuthException;
@@ -57,6 +58,15 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:30|unique:users',
+            'email' => 'required|max:255|email|unique:users'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Username or email already registered!'], 422);
+        }
+
         $payload = [
             'password' => \Hash::make($request->password),
             'email' => $request->email,

@@ -17,6 +17,8 @@ export default class Main extends Component {
 
         this.state = {
             products: [],
+            currentPage: 1,
+            productsPerPage: 15,
             currentProduct: null,
             newReviewForm: false,
             editBtnClicked: false,
@@ -31,6 +33,8 @@ export default class Main extends Component {
                 : ""
         }
 
+        this.handlePageClick = this.handlePageClick.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.renderNewProducts = this.renderNewProducts.bind(this);
         this.renderReviewForm = this.renderReviewForm.bind(this);
         this.handleAddProduct = this.handleAddProduct.bind(this);
@@ -83,7 +87,7 @@ export default class Main extends Component {
         }        
     }
 
-    renderProducts() {
+    listProducts() {
         const listStyle = {
             listStyle: 'none',
             fontSize: '18px',
@@ -94,16 +98,22 @@ export default class Main extends Component {
             borderRight: '0'
         }
 
-        return this.state.products.map((product) => {
+        const { products, currentPage, productsPerPage } = this.state;
+
+        const indexOfLastProduct = currentPage * productsPerPage;
+        const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);        
+
+        const renderProducts = currentProducts.map((product) => {
             return (
                 <li
                     className="list-group-item"
-                    style={listStyle} 
+                    style={listStyle}
                     onClick={() =>this.handleClick(product)} 
                     key={product.title}
                 >
-                    <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4> 
-                    <b>
+                    <h4 style={{ display: 'inline-block' }}>{product.title}</h4> 
+                    <b style={{ float: 'right', marginRight: '5px' }}>
                         {Math.round(product.rating)}
                         <span 
                             className="fa fa-star" 
@@ -114,6 +124,56 @@ export default class Main extends Component {
                 </li>
             );
         });
+
+        const pageNumbers = [];
+
+        for (let i = 1; i <= Math.ceil(products.length / productsPerPage); i++) {
+            pageNumbers.push(i);
+        }
+
+        const renderPageNumbers = pageNumbers.map(number => {
+            return (
+                <li
+                    
+                    key={number}
+                    id={number}
+                    onClick={this.handlePageClick}
+                >
+                    <a href="#all-reviews">
+                        {number}
+                    </a>
+                </li>
+            );
+        });
+
+        return (
+            <div>
+                <ul className="list-group" style={{ marginBottom: '0' }}>
+                    {renderProducts}
+                </ul>
+                <nav style={{ textAlign: 'center' }}>
+                    <ul className="pagination">
+                        <li>
+                            <a href="#!" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {renderPageNumbers}
+                        <li>
+                            <a href="#!" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        )
+    }
+
+    handlePageClick(event) {
+        this.setState({
+            currentPage: Number(event.currentTarget.id)
+        });
     }
 
     renderNewProducts(limit, renderThumbs) {
@@ -121,7 +181,9 @@ export default class Main extends Component {
             listStyle: 'none',
             fontSize: '18px',
             lineHeight: '1.8em',
-            borderRadius: '0'
+            borderRadius: '0',
+            borderLeft: '0',
+            borderRight: '0'
         }
 
         const reviewStars = (star) => {
@@ -164,7 +226,7 @@ export default class Main extends Component {
                         </div>
                     )}
 
-                    <h5>{product.description}</h5>
+                    <h5><b>Version: </b>{product.description}</h5>
 
                     <hr style={{ width: '40%' }}/>
 
@@ -197,7 +259,11 @@ export default class Main extends Component {
 
         var formData = new FormData();
         formData.append("title", product.title);
-        formData.append("image", product.image, product.image.name);
+
+        if (product.image) {
+            formData.append("image", product.image, product.image.name);
+        }
+
         formData.append("description", product.description);
         formData.append("user_interface", product.user_interface);
         formData.append("speed_size", product.speed_size);
@@ -206,9 +272,6 @@ export default class Main extends Component {
         formData.append("administration", product.administration);
         formData.append("rating", product.rating);
         formData.append("availability", product.availability);
-
-        console.log(product);
-        
 
         axios({
             method:'post',
@@ -222,20 +285,12 @@ export default class Main extends Component {
         .then(response => {
             return response;
         })
-        .then( data => {
-            console.log(data);
-
-            console.log('Prev State:');
-            console.log(this.prevState);
-            
-            
+        .then( data => {            
             this.setState((prevState)=> ({
                 products: prevState.products.concat(data.data),
+                newReviewForm: false,
                 currentProduct: data.data
             }));
-
-            console.log(this.state.products);
-            
         });
     }
 
@@ -270,20 +325,15 @@ export default class Main extends Component {
         product.software = Number(product.software);
         product.support = Number(product.support);
         product.administration = Number(product.administration);
-        product.rating = Number(product.rating);
+        product.rating = parseFloat(product.rating);
         product.availability = Number(product.availability);
-
-        console.log(product);
-        
         
         var formData = new FormData();
 
         formData.append("title", product.title);
         
-        if (product.image.name) {
+        if (product.image) {
             formData.append("image", product.image, product.image.name);
-        } else {
-            formData.append("image", "");
         }
 
         formData.append("description", product.description);
@@ -294,13 +344,12 @@ export default class Main extends Component {
         formData.append("administration", product.administration);
         formData.append("rating", product.rating);
         formData.append("availability", product.availability);
+        
+        const currentProduct = this.state.currentProduct;
 
-        // Log FormData
         for (var pair of formData.entries()) {
             console.log(pair[0]+ ', ' + pair[1]); 
         }
-        
-        const currentProduct = this.state.currentProduct;
 
         axios({
             method:'post',
@@ -345,8 +394,6 @@ export default class Main extends Component {
         axios
             .post("api/user/login/", formData)
             .then(response => {
-                console.log(response);
-                
             return response;
             
         })
@@ -366,9 +413,6 @@ export default class Main extends Component {
                     user: userData
                 }
 
-                console.log(userData);
-                
-
                 localStorage["appState"] = JSON.stringify(appState);
 
                 this.setState({
@@ -376,7 +420,6 @@ export default class Main extends Component {
                     user: appState.user,
                     token: appState.user.auth_token
                 });
-                console.log('Test');
             } else {
                 alert("Login Failed!");
             } 
@@ -442,8 +485,8 @@ export default class Main extends Component {
                     .html("Register");
             }
         })
-        .catch(error => {
-            console.log(`${formData} ${error}`);
+        .catch(errors => {
+            alert(errors.response.data.error);
             
             $(".email-login-btn")
                 .removeAttr("disabled")
@@ -561,7 +604,7 @@ export default class Main extends Component {
                                 </div>
                                 <div className="panel-body text-center">
                                     <p>
-                                        View and post reviews on computer Operating Systems with a calculated overall star rating out of 5 based on UI, speed/size, software, support and administration.
+                                        View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories based on UI, speed/size, software, support and system administration.
                                     </p>
                                 </div>
                                 <div className="panel-footer">
@@ -570,12 +613,18 @@ export default class Main extends Component {
                                     <h5 className="text-center">OS Reviews &copy; 2019</h5>
                                 </div>
                             </div>
+
+
+                            <div className="text-center">
+                                <h4 style={{ marginBottom: '15px' }}>Contribute to future development:</h4>
+                                <img src="https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png" alt="" width="32%"/>
+                            </div>
                             
                             <hr/>
 
-                            <h4 className="text-center">Need a free operating system?</h4>
-                            <div style={{textAlign: 'center', margin: '30px 0'}}>
-                                <img src="https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png" width="80%" style={{ border: '1px solid #9e9e9e', borderRadius: '3px' }}/>
+                            <div className="text-center">
+                                <h4>Need a fast, free operating system?</h4>
+                                <img src="https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png" width="80%" style={{ border: '1px solid #bdbdbd', borderRadius: '3px', margin: '30px 0' }}/>
                             </div>
                         </div>
 
@@ -583,13 +632,11 @@ export default class Main extends Component {
                             <div>
                                 <div>
                                     <div className="panel panel-default" style={{ margin: '15px' }}>
-                                        <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+                                        <div className="panel-heading" style={{ backgroundColor: '#f5f5f5', borderBottom: '0' }}>
                                             <h3>All Reviews ({this.state.products.length})</h3>
                                         </div>
                                         <div>
-                                            <ul className="list-group" style={{ marginBottom: '0' }}>
-                                                { this.renderProducts() }
-                                            </ul>
+                                            { this.listProducts() }
                                         </div>
                                     </div>
                                 </div>

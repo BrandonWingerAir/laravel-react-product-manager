@@ -23,7 +23,7 @@ class Home extends React.Component {
       listStyle: 'none',
       fontSize: '18px',
       lineHeight: '1.8em',
-      borderRadius: '0'
+      paddingLeft: '1em'
     }
     
     return this.props.products.filter((product) => {
@@ -31,13 +31,6 @@ class Home extends React.Component {
         return product;
       }
     }).map((product) => {
-      const listStyle = {
-        listStyle: 'none',
-        fontSize: '18px',
-        lineHeight: '1.8em',
-        paddingLeft: '1em',
-      }
-
       var newKey = `${product.title} (User)`;
 
       return (
@@ -47,7 +40,15 @@ class Home extends React.Component {
           onClick={() =>this.handleClick(product)} 
           key={newKey}
         >
-          <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4> 
+          <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4>
+          <b>
+              {Math.round(product.rating)}
+              <span 
+                  className="fa fa-star" 
+                  aria-hidden="true" 
+                  style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
+              ></span>
+          </b>
         </li>
       );
     });
@@ -72,29 +73,33 @@ class Home extends React.Component {
     return (
       <div style={styles}>
         <h2>Dashboard &#127968;</h2>
+        <hr style={{ width: '50%' }}/>
         <div className="panel panel-default" style={{ width: '80%', margin: '0 auto 15px' }}>
           <div className="panel-body">
-            <h4>Username: {this.state.user.name}</h4>
-            <button
-                className="btn btn-success"
-                onClick={this.props.renderReviewForm}
-                style={{ margin: '0 auto' }}
-            >
-              New Review
-            </button>
+            <div className="list-group-item" style={{ width: '40%', borderRadius: '4px', margin: '0 auto', padding: '0' }}>
+              <h3 style={{ marginTop: '10px' }}>{this.state.user.name}</h3>
+            </div>
+            <hr style={{ width: '80%' }}/>
             <h4>My Reviews:</h4>
             <ul>
               {this.renderUserReviews()}
             </ul>
+            <button
+                className="btn btn-success"
+                onClick={this.props.renderReviewForm}
+                style={{ margin: '0 10px' }}
+            >
+              Add New
+            </button>
+            <button
+              className="btn btn-info"
+              onClick={this.props.logoutUser}
+              style={{ margin: '0 10px' }}
+            >
+              Logout{" "}
+            </button>
           </div>
         </div>
-        <button
-          className="btn btn-info"
-          onClick={this.props.logoutUser}
-          style={{ marginBottom: '20px' }}
-        >
-          Logout{" "}
-        </button>
       </div>
     );
   }

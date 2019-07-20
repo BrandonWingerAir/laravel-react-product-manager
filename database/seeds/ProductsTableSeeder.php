@@ -44,7 +44,7 @@ class ProductsTableSeeder extends Seeder
 
             Product::create([
                 'title' => $faker->unique()->devicePlatform,
-                'description' => $faker->unique()->localIpv4,
+                'description' => $faker->unique()->randomFloat($nbMaxDecimals = 1, $min = 0.1, $max = 20),
                 'user_interface' => $user_interface,
                 'speed_size' => $speed_size,
                 'software' => $software,
