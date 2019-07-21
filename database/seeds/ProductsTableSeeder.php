@@ -19,7 +19,7 @@ class ProductsTableSeeder extends Seeder
         $addVariety = true;
 
         for ($i = 0; $i < 14; $i++) {
-            $min = 2;
+            $min = 3;
             $max = 5;
 
             $user_interface = $faker->numberBetween($min, $max);

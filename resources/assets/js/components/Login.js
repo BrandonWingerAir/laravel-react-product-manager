@@ -9,14 +9,14 @@ const Login = ({ history, loginUser = f => f }) => {
     loginUser(_email.value, _password.value);
   };
 
-  const inputStyle = { width: '70%', marginBottom: '20px' }
+  const inputStyle = { width: '75%', marginBottom: '20px' }
 
   return (
     <div id="main">
       <div className="col-xs-12 col-md-4 col-md-push-3">
-        <form action="" id="login-form" onSubmit={handleLogin} method="post" className="panel panel-default text-center">
+        <form action="" id="login-form" onSubmit={handleLogin} method="post" className="panel panel-default text-center" style={{ boxShadow: 'none', width: '85%', margin: '15px auto' }}>
           <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
-            <h3>
+            <h3 style={{ marginTop: '10px' }}>
               User Login
             </h3>
           </div>
@@ -34,7 +34,7 @@ const Login = ({ history, loginUser = f => f }) => {
               Login
             </button>
 
-            <Link to="/register">
+            <Link to="/register" style={{ color: '#636b6f' }}>
               Register
             </Link>
           </div>

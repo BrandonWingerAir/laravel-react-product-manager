@@ -131,7 +131,7 @@ const Product = props => {
               <h3>Latest Reviews</h3>
             </div>
             <div>
-              <ul className="list-group" style={{ marginBottom: '0' }}>
+              <ul id="new-products" className="list-group" style={{ marginBottom: '0' }}>
                 { renderNewProducts(5) }
               </ul>
             </div>

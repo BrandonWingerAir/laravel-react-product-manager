@@ -89,48 +89,48 @@ class AddProduct extends Component {
             </div>
             
             <label>User Interface</label>
-            <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('user_interface', e)}>
-              <option>1 (Poor)</option>
-              <option>2 (Okay)</option>
-              <option selected>3 (Good)</option>
-              <option>4 (Great)</option>
-              <option>5 (Perfect)</option>
+            <select className="form-control" style={createPriceStyle} type="number" value="3" onChange={(e)=>this.handleRating('user_interface', e)}>
+              <option value="1">1 (Poor)</option>
+              <option value="2">2 (Okay)</option>
+              <option value="3">3 (Good)</option>
+              <option value="4">4 (Great)</option>
+              <option value="5">5 (Perfect)</option>
             </select>
 
             <label>Speed/Size</label>
-            <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
-              <option>1 (Poor)</option>
-              <option>2 (Okay)</option>
-              <option selected>3 (Good)</option>
-              <option>4 (Great)</option>
-              <option>5 (Perfect)</option>
+            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
+              <option value="1">1 (Poor)</option>
+              <option value="2">2 (Okay)</option>
+              <option value="3">3 (Good)</option>
+              <option value="4">4 (Great)</option>
+              <option value="5">5 (Perfect)</option>
             </select>
 
             <label>Software</label>
-            <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('software', e)}>
-              <option>1 (Poor)</option>
-              <option>2 (Okay)</option>
-              <option selected>3 (Good)</option>
-              <option>4 (Great)</option>
-              <option>5 (Perfect)</option>
+            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('software', e)}>
+              <option value="1">1 (Poor)</option>
+              <option value="2">2 (Okay)</option>
+              <option value="3">3 (Good)</option>
+              <option value="4">4 (Great)</option>
+              <option value="5">5 (Perfect)</option>
             </select>
 
             <label>Security</label>
-            <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('administration', e)}>
-              <option>1 (Poor)</option>
-              <option>2 (Okay)</option>
-              <option selected>3 (Good)</option>
-              <option>4 (Great)</option>
-              <option>5 (Perfect)</option>
+            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('administration', e)}>
+              <option value="1">1 (Poor)</option>
+              <option value="2">2 (Okay)</option>
+              <option value="3">3 (Good)</option>
+              <option value="4">4 (Great)</option>
+              <option value="5">5 (Perfect)</option>
             </select>
 
             <label>Support</label>
-            <select className="form-control" style={createPriceStyle} type="number" onChange={(e)=>this.handleRating('support', e)}>
-              <option>1 (Poor)</option>
-              <option>2 (Okay)</option>
-              <option selected>3 (Good)</option>
-              <option>4 (Great)</option>
-              <option>5 (Perfect)</option>
+            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('support', e)}>
+              <option value="1">1 (Poor)</option>
+              <option value="2">2 (Okay)</option>
+              <option value="3">3 (Good)</option>
+              <option value="4">4 (Great)</option>
+              <option value="5">5 (Perfect)</option>
             </select>
 
             <div className="form-group" style={createPriceStyle}>

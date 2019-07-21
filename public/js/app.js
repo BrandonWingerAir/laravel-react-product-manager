@@ -23933,7 +23933,7 @@ var Product = function Product(props) {
           null,
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'ul',
-            { className: 'list-group', style: { marginBottom: '0' } },
+            { id: 'new-products', className: 'list-group', style: { marginBottom: '0' } },
             renderNewProducts(5)
           )
         )
@@ -44700,6 +44700,8 @@ var Main = function (_Component) {
         };
 
         _this.handlePageClick = _this.handlePageClick.bind(_this);
+        _this.handlePrevClick = _this.handlePrevClick.bind(_this);
+        _this.handleNextClick = _this.handleNextClick.bind(_this);
         _this.handleClick = _this.handleClick.bind(_this);
         _this.renderNewProducts = _this.renderNewProducts.bind(_this);
         _this.renderReviewForm = _this.renderReviewForm.bind(_this);
@@ -44809,10 +44811,26 @@ var Main = function (_Component) {
             }
 
             var renderPageNumbers = pageNumbers.map(function (number) {
+                if (currentPage === number) {
+                    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'li',
+                        {
+                            key: number,
+                            id: number,
+                            className: 'active',
+                            onClick: _this3.handlePageClick
+                        },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'span',
+                            { href: '#all-reviews' },
+                            number
+                        )
+                    );
+                }
+
                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'li',
                     {
-
                         key: number,
                         id: number,
                         onClick: _this3.handlePageClick
@@ -44833,18 +44851,30 @@ var Main = function (_Component) {
                     { className: 'list-group', style: { marginBottom: '0' } },
                     renderProducts
                 ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                this.state.products.length > 15 ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'nav',
                     { style: { textAlign: 'center' } },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'ul',
                         { className: 'pagination' },
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        currentPage === 1 ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'li',
+                            { className: 'disabled' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'span',
+                                null,
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'span',
+                                    { 'aria-hidden': 'true' },
+                                    '\xAB'
+                                )
+                            )
+                        ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'li',
                             null,
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'a',
-                                { href: '#!', 'aria-label': 'Previous' },
+                                { href: '#!', 'aria-label': 'Previous', onClick: this.handlePrevClick },
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'span',
                                     { 'aria-hidden': 'true' },
@@ -44853,12 +44883,24 @@ var Main = function (_Component) {
                             )
                         ),
                         renderPageNumbers,
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        currentPage === pageNumbers.length ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'li',
+                            { className: 'disabled' },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                'span',
+                                null,
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'span',
+                                    { 'aria-hidden': 'true' },
+                                    '\xBB'
+                                )
+                            )
+                        ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                             'li',
                             null,
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'a',
-                                { href: '#!', 'aria-label': 'Next' },
+                                { href: '#!', 'aria-label': 'Next', onClick: this.handlePrevClick },
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'span',
                                     { 'aria-hidden': 'true' },
@@ -44867,7 +44909,7 @@ var Main = function (_Component) {
                             )
                         )
                     )
-                )
+                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
             );
         }
     }, {
@@ -44875,6 +44917,20 @@ var Main = function (_Component) {
         value: function handlePageClick(event) {
             this.setState({
                 currentPage: Number(event.currentTarget.id)
+            });
+        }
+    }, {
+        key: 'handleNextClick',
+        value: function handleNextClick() {
+            this.setState({
+                currentPage: this.state.currentPage + 1
+            });
+        }
+    }, {
+        key: 'handlePrevClick',
+        value: function handlePrevClick() {
+            this.setState({
+                currentPage: this.state.currentPage - 1
             });
         }
     }, {
@@ -44907,6 +44963,7 @@ var Main = function (_Component) {
 
             return this.state.products.slice(0).reverse().slice(0, limit).map(function (product) {
                 var newKey = product.title + ' (New)';
+                console.log(product.rating);
 
                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'li',
@@ -44942,7 +44999,7 @@ var Main = function (_Component) {
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'ul',
                         { className: 'list-unstyled list-inline' },
-                        reviewStars(product.rating)
+                        reviewStars(Math.round(product.rating))
                     )
                 );
             });
@@ -45069,31 +45126,6 @@ var Main = function (_Component) {
 
             var currentProduct = this.state.currentProduct;
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = formData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var pair = _step.value;
-
-                    console.log(pair[0] + ', ' + pair[1]);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
             __WEBPACK_IMPORTED_MODULE_9_axios___default()({
                 method: 'post',
                 url: 'api/products/' + currentProduct.id + '?_method=PUT',
@@ -45209,7 +45241,13 @@ var Main = function (_Component) {
                     __WEBPACK_IMPORTED_MODULE_10_jquery___default()("#email-login-btn").removeAttr("disabled").html("Register");
                 }
             }).catch(function (errors) {
-                alert(errors.response.data.error);
+                if (typeof errors.response.data.errors.password !== 'undefined') {
+                    alert(errors.response.data.errors.password[0]);
+                } else if (typeof errors.response.data.errors.email !== 'undefined') {
+                    alert(errors.response.data.errors.email[0]);
+                } else if (typeof errors.response.data.errors.password !== 'undefined') {
+                    alert(errors.response.data.errors.password[0]);
+                }
 
                 __WEBPACK_IMPORTED_MODULE_10_jquery___default()(".email-login-btn").removeAttr("disabled").html("Register");
             });
@@ -45346,13 +45384,13 @@ var Main = function (_Component) {
                             { className: 'col-xs-12 col-md-4 col-md-push-3' },
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 'div',
-                                { className: 'panel panel-default', style: { margin: '15px' } },
+                                { className: 'panel panel-default', style: { margin: '15px', boxShadow: 'none' } },
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'div',
                                     { className: 'panel-heading', style: { backgroundColor: '#f5f5f5' } },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                         'h2',
-                                        { className: 'text-center' },
+                                        { className: 'text-center', style: { marginTop: '10px' } },
                                         'About'
                                     )
                                 ),
@@ -45363,14 +45401,19 @@ var Main = function (_Component) {
                                         'p',
                                         null,
                                         'View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories based on UI, speed/size, software, support and system administration.'
+                                    ),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                        'h2',
+                                        { style: { margin: '10px 0 0' } },
+                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-github', 'aria-hidden': 'true' })
                                     )
                                 ),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     'div',
-                                    { className: 'panel-footer' },
+                                    { className: 'panel-footer text-center' },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                         'h4',
-                                        { className: 'text-center' },
+                                        { style: { margin: '5px 10px', verticalAlign: 'middle' } },
                                         'Developed by Brandon Winger-Air'
                                     ),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
@@ -45389,7 +45432,7 @@ var Main = function (_Component) {
                                     { style: { marginBottom: '15px' } },
                                     'Contribute to future development:'
                                 ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png', alt: '', width: '32%' })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png', alt: '', width: '25%' })
                             ),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -45414,7 +45457,7 @@ var Main = function (_Component) {
                                     null,
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                         'div',
-                                        { className: 'panel panel-default', style: { margin: '15px' } },
+                                        { className: 'panel panel-default', style: { margin: '15px', boxShadow: 'none' } },
                                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                             'div',
                                             { className: 'panel-heading', style: { backgroundColor: '#f5f5f5', borderBottom: '0' } },
@@ -58871,32 +58914,32 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'select',
-              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+              { className: 'form-control', style: createPriceStyle, type: 'number', value: '3', onChange: function onChange(e) {
                   return _this2.handleRating('user_interface', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '1' },
                 '1 (Poor)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '2' },
                 '2 (Okay)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { selected: true },
+                { value: '3' },
                 '3 (Good)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '4' },
                 '4 (Great)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '5' },
                 '5 (Perfect)'
               )
             ),
@@ -58907,32 +58950,32 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'select',
-              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+              { className: 'form-control', style: createPriceStyle, value: '3', type: 'number', onChange: function onChange(e) {
                   return _this2.handleRating('speed_size', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '1' },
                 '1 (Poor)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '2' },
                 '2 (Okay)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { selected: true },
+                { value: '3' },
                 '3 (Good)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '4' },
                 '4 (Great)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '5' },
                 '5 (Perfect)'
               )
             ),
@@ -58943,32 +58986,32 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'select',
-              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+              { className: 'form-control', style: createPriceStyle, value: '3', type: 'number', onChange: function onChange(e) {
                   return _this2.handleRating('software', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '1' },
                 '1 (Poor)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '2' },
                 '2 (Okay)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { selected: true },
+                { value: '3' },
                 '3 (Good)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '4' },
                 '4 (Great)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '5' },
                 '5 (Perfect)'
               )
             ),
@@ -58979,32 +59022,32 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'select',
-              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+              { className: 'form-control', style: createPriceStyle, value: '3', type: 'number', onChange: function onChange(e) {
                   return _this2.handleRating('administration', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '1' },
                 '1 (Poor)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '2' },
                 '2 (Okay)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { selected: true },
+                { value: '3' },
                 '3 (Good)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '4' },
                 '4 (Great)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '5' },
                 '5 (Perfect)'
               )
             ),
@@ -59015,32 +59058,32 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'select',
-              { className: 'form-control', style: createPriceStyle, type: 'number', onChange: function onChange(e) {
+              { className: 'form-control', style: createPriceStyle, value: '3', type: 'number', onChange: function onChange(e) {
                   return _this2.handleRating('support', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '1' },
                 '1 (Poor)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '2' },
                 '2 (Okay)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { selected: true },
+                { value: '3' },
                 '3 (Good)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '4' },
                 '4 (Great)'
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                null,
+                { value: '5' },
                 '5 (Perfect)'
               )
             ),
@@ -59488,7 +59531,7 @@ var Register = function Register(_ref) {
     registerUser(_name.value, _email.value, _password.value);
   };
 
-  var inputStyle = { width: '70%', marginBottom: '20px' };
+  var inputStyle = { width: '75%', marginBottom: '20px' };
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     "div",
@@ -59498,43 +59541,50 @@ var Register = function Register(_ref) {
       { className: "col-xs-12 col-md-4 col-md-push-3" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "form",
-        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "text-center", style: { border: '1px solid #e0e0e0', width: '80%', margin: '30px auto', paddingBottom: '20px', background: '#fafafa' } },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "h3",
-          { style: { boxSizing: 'border-box', margin: 0, padding: '25px', background: '#f5f5f5 ' } },
-          "Register"
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("hr", { style: { marginTop: 0, borderColor: '#e0e0e0' } }),
+        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "panel panel-default text-center", style: { boxShadow: 'none', width: '85%', margin: '15px auto' } },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "form-group" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-              return _name = input;
-            }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block", style: inputStyle, placeholder: "Name" })
+          { className: "panel-heading", style: { backgroundColor: '#f5f5f5' } },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "h3",
+            { style: { marginTop: '10px' } },
+            "Register"
+          )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "form-group" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-              return _email = input;
-            }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", style: inputStyle, placeholder: "Email" })
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "form-group" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
-              return _password = input;
-            }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", style: inputStyle, placeholder: "Password" })
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "button",
-          { type: "submit", className: "btn btn-primary center-block text-center email-login-btn", style: { marginBottom: '10px' }, href: "#!" },
-          "Register"
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-          { to: "/login" },
-          "Login"
+          { className: "panel-body" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "form-group" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+                return _name = input;
+              }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block", style: inputStyle, placeholder: "Name" })
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "form-group" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+                return _email = input;
+              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", style: inputStyle, placeholder: "Email" })
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "form-group" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
+                return _password = input;
+              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", style: inputStyle, placeholder: "Password" })
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "button",
+            { type: "submit", className: "btn btn-primary center-block text-center email-login-btn", style: { marginBottom: '10px' }, href: "#!" },
+            "Register"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
+            { to: "/login", style: { color: '#636b6f' } },
+            "Login"
+          )
         )
       )
     )
@@ -59569,7 +59619,7 @@ var Login = function Login(_ref) {
     loginUser(_email.value, _password.value);
   };
 
-  var inputStyle = { width: '70%', marginBottom: '20px' };
+  var inputStyle = { width: '75%', marginBottom: '20px' };
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     "div",
@@ -59579,13 +59629,13 @@ var Login = function Login(_ref) {
       { className: "col-xs-12 col-md-4 col-md-push-3" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "form",
-        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "panel panel-default text-center" },
+        { action: "", id: "login-form", onSubmit: handleLogin, method: "post", className: "panel panel-default text-center", style: { boxShadow: 'none', width: '85%', margin: '15px auto' } },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
           { className: "panel-heading", style: { backgroundColor: '#f5f5f5' } },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "h3",
-            null,
+            { style: { marginTop: '10px' } },
             "User Login"
           )
         ),
@@ -59613,7 +59663,7 @@ var Login = function Login(_ref) {
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-            { to: "/register" },
+            { to: "/register", style: { color: '#636b6f' } },
             "Register"
           )
         )
@@ -59676,40 +59726,62 @@ var Home = function (_React$Component) {
         paddingLeft: '1em'
       };
 
-      return this.props.products.filter(function (product) {
+      var hasReviews = this.props.products.filter(function (product) {
         if (product.posted_by === _this2.state.user.name) {
           return product;
         }
-      }).map(function (product) {
-        var newKey = product.title + " (User)";
+      }).length > 0;
 
-        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "li",
-          {
-            className: "list-group-item",
-            style: listStyle,
-            onClick: function onClick() {
-              return _this2.handleClick(product);
+      if (hasReviews) {
+        return this.props.products.filter(function (product) {
+          if (product.posted_by === _this2.state.user.name) {
+            return product;
+          }
+        }).map(function (product) {
+          var newKey = product.title + " (User)";
+
+          return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "li",
+            {
+              className: "list-group-item",
+              style: { width: '90%', margin: '0 auto' },
+              onClick: function onClick() {
+                return _this2.handleClick(product);
+              },
+              key: newKey
             },
-            key: newKey
-          },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "h4",
-            { style: { display: 'inline-block', marginRight: '5px' } },
-            product.title
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "b",
-            null,
-            Math.round(product.rating),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", {
-              className: "fa fa-star",
-              "aria-hidden": "true",
-              style: { color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }
-            })
-          )
-        );
-      });
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "h4",
+              { style: { display: 'inline-block', marginRight: '5px' } },
+              product.title
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "b",
+              null,
+              Math.round(product.rating),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", {
+                className: "fa fa-star",
+                "aria-hidden": "true",
+                style: { color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }
+              })
+            )
+          );
+        });
+      }
+
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "li",
+        {
+          id: "no-user-reviews",
+          className: "list-group-item",
+          style: { width: '70%', margin: '0 auto' }
+        },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "h4",
+          null,
+          "No posts"
+        )
+      );
     }
   }, {
     key: "componentDidMount",

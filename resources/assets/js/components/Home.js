@@ -25,33 +25,51 @@ class Home extends React.Component {
       lineHeight: '1.8em',
       paddingLeft: '1em'
     }
-    
-    return this.props.products.filter((product) => {
+
+    let hasReviews = this.props.products.filter((product) => {
       if (product.posted_by === this.state.user.name) {
         return product;
       }
-    }).map((product) => {
-      var newKey = `${product.title} (User)`;
+    }).length > 0;    
 
-      return (
-        <li 
+    if (hasReviews) {
+      return this.props.products.filter((product) => {
+        if (product.posted_by === this.state.user.name) {
+          return product;
+        }
+      }).map((product) => {
+        var newKey = `${product.title} (User)`;
+  
+        return (
+          <li 
+            className="list-group-item"
+            style={{ width: '90%', margin: '0 auto' }}
+            onClick={() =>this.handleClick(product)} 
+            key={newKey}
+          >
+            <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4>
+            <b>
+                {Math.round(product.rating)}
+                <span 
+                    className="fa fa-star" 
+                    aria-hidden="true" 
+                    style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
+                ></span>
+            </b>
+          </li>
+        );
+      });
+    }
+
+    return (
+      <li 
+          id="no-user-reviews"
           className="list-group-item"
-          style={listStyle}
-          onClick={() =>this.handleClick(product)} 
-          key={newKey}
+          style={{ width: '70%', margin: '0 auto' }}
         >
-          <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4>
-          <b>
-              {Math.round(product.rating)}
-              <span 
-                  className="fa fa-star" 
-                  aria-hidden="true" 
-                  style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
-              ></span>
-          </b>
-        </li>
-      );
-    });
+          <h4>No posts</h4>
+      </li>
+    )
   }
 
   componentDidMount() {

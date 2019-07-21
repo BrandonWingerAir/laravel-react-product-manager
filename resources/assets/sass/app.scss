@@ -38,6 +38,11 @@ input[type="submit"] {
   margin: 10px 0 20px;
 }
 
+#no-user-reviews:hover {
+  background: #fff;
+  cursor: initial;
+}
+
 @media screen and (max-width: '768px') {
   .reorder-xs {
     display: inline-block;

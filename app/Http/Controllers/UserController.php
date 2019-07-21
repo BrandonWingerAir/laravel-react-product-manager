@@ -60,11 +60,12 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:30|unique:users',
-            'email' => 'required|max:255|email|unique:users'
+            'email' => 'required|max:255|email|unique:users',
+            'password' => 'required|min:8'
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => 'Username or email already registered!'], 422);
+            return response()->json(['errors' => $validator->errors(), 'error' => 'Username or email already registered!'], 422);
         }
 
         $payload = [

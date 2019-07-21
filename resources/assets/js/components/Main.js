@@ -34,6 +34,8 @@ export default class Main extends Component {
         }
 
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.handlePrevClick = this.handlePrevClick.bind(this);
+        this.handleNextClick = this.handleNextClick.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.renderNewProducts = this.renderNewProducts.bind(this);
         this.renderReviewForm = this.renderReviewForm.bind(this);
@@ -132,40 +134,74 @@ export default class Main extends Component {
         }
 
         const renderPageNumbers = pageNumbers.map(number => {
+            if (currentPage === number) {
+                return (
+                    <li
+                        key={number}
+                        id={number}
+                        className="active"
+                        onClick={this.handlePageClick}
+                    >
+                        <span href="#all-reviews">
+                            {number}
+                        </span>
+                    </li>
+                )
+            }
+
             return (
-                <li
-                    
-                    key={number}
-                    id={number}
-                    onClick={this.handlePageClick}
-                >
-                    <a href="#all-reviews">
-                        {number}
-                    </a>
-                </li>
+            <li
+                key={number}
+                id={number}
+                onClick={this.handlePageClick}
+            >
+                <a href="#all-reviews">
+                    {number}
+                </a>
+            </li>
             );
         });
 
         return (
             <div>
                 <ul className="list-group" style={{ marginBottom: '0' }}>
-                    {renderProducts}
-                </ul>
+                {renderProducts}
+            </ul>
+            { this.state.products.length > 15 ? (
                 <nav style={{ textAlign: 'center' }}>
                     <ul className="pagination">
-                        <li>
-                            <a href="#!" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+                        { currentPage === 1 ? (
+                            <li className="disabled">
+                                <span>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </span>
+                            </li>
+                        ) : (
+                            <li>
+                                <a href="#!" aria-label="Previous" onClick={this.handlePrevClick}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        ) }
                         {renderPageNumbers}
-                        <li>
-                            <a href="#!" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
+                        { currentPage === pageNumbers.length ? (
+                            <li className="disabled">
+                                <span>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </span>
+                            </li>
+                        ) : (
+                            <li>
+                                <a href="#!" aria-label="Next" onClick={this.handlePrevClick}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        ) }
                     </ul>
                 </nav>
+            ) : (
+                <div/>
+            ) }
             </div>
         )
     }
@@ -173,6 +209,18 @@ export default class Main extends Component {
     handlePageClick(event) {
         this.setState({
             currentPage: Number(event.currentTarget.id)
+        });
+    }
+
+    handleNextClick() {
+        this.setState({
+            currentPage: this.state.currentPage + 1
+        });
+    }
+    
+    handlePrevClick() {
+        this.setState({
+            currentPage: this.state.currentPage - 1
         });
     }
 
@@ -202,6 +250,8 @@ export default class Main extends Component {
 
         return this.state.products.slice(0).reverse().slice(0, limit).map((product) => {
             var newKey = `${product.title} (New)`;
+            console.log(product.rating);
+            
 
             return (
                 <li 
@@ -231,7 +281,7 @@ export default class Main extends Component {
                     <hr style={{ width: '40%' }}/>
 
                     <ul className="list-unstyled list-inline">
-                        {(reviewStars(product.rating))}
+                        {(reviewStars(Math.round(product.rating)))}
                     </ul>
                 </li>
             );
@@ -346,10 +396,6 @@ export default class Main extends Component {
         formData.append("availability", product.availability);
         
         const currentProduct = this.state.currentProduct;
-
-        for (var pair of formData.entries()) {
-            console.log(pair[0]+ ', ' + pair[1]); 
-        }
 
         axios({
             method:'post',
@@ -486,7 +532,13 @@ export default class Main extends Component {
             }
         })
         .catch(errors => {
-            alert(errors.response.data.error);
+            if (typeof errors.response.data.errors.password !== 'undefined') {
+                alert(errors.response.data.errors.password[0]);
+            } else if (typeof errors.response.data.errors.email !== 'undefined') {
+                alert(errors.response.data.errors.email[0]);
+            } else if (typeof errors.response.data.errors.password !== 'undefined') {
+                alert(errors.response.data.errors.password[0]);
+            }
             
             $(".email-login-btn")
                 .removeAttr("disabled")
@@ -598,17 +650,23 @@ export default class Main extends Component {
 
                     <div className="reorder-xs">
                         <div className="col-xs-12 col-md-4 col-md-push-3">
-                            <div className="panel panel-default" style={{ margin: '15px' }}>
+                            <div className="panel panel-default" style={{ margin: '15px', boxShadow: 'none' }}>
                                 <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
-                                    <h2 className="text-center">About</h2>
+                                    <h2 className="text-center" style={{ marginTop: '10px' }}>About</h2>
                                 </div>
                                 <div className="panel-body text-center">
                                     <p>
                                         View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories based on UI, speed/size, software, support and system administration.
                                     </p>
+                                    <h2 style={{ margin: '10px 0 0' }}>
+                                        <i className="fa fa-github" aria-hidden="true"></i>
+                                    </h2>
                                 </div>
-                                <div className="panel-footer">
-                                    <h4 className="text-center">Developed by Brandon Winger-Air</h4>
+                                <div className="panel-footer text-center">
+                                    <h4 style={{ margin: '5px 10px', verticalAlign: 'middle' }}>
+                                        Developed by Brandon Winger-Air
+                                    </h4> 
+                                    
                                     <hr/>
                                     <h5 className="text-center">OS Reviews &copy; 2019</h5>
                                 </div>
@@ -617,7 +675,7 @@ export default class Main extends Component {
 
                             <div className="text-center">
                                 <h4 style={{ marginBottom: '15px' }}>Contribute to future development:</h4>
-                                <img src="https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png" alt="" width="32%"/>
+                                <img src="https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png" alt="" width="25%"/>
                             </div>
                             
                             <hr/>
@@ -631,7 +689,7 @@ export default class Main extends Component {
                         <div id="all-reviews" className="col-xs-12 col-md-3 col-md-pull-9">
                             <div>
                                 <div>
-                                    <div className="panel panel-default" style={{ margin: '15px' }}>
+                                    <div className="panel panel-default" style={{ margin: '15px', boxShadow: 'none' }}>
                                         <div className="panel-heading" style={{ backgroundColor: '#f5f5f5', borderBottom: '0' }}>
                                             <h3>All Reviews ({this.state.products.length})</h3>
                                         </div>
