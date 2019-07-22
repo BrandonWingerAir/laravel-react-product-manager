@@ -9,6 +9,7 @@ class AddProduct extends Component {
             id: '',
             title: '',
             description: '',
+            notes: '',
             user_interface: 5,
             speed_size: 5,
             software: 5,
@@ -72,23 +73,31 @@ class AddProduct extends Component {
       <div> 
         <div style={divStyle}> 
           <h2>New Product</h2>
+          <hr/>
           <form onSubmit={this.handleSubmit} encType="multipart/form-data">
             <div className="form-group">
-              <label>Title:</label>
+              <label><h4>Title:</h4></label>
               <input className="form-control" type="text" onChange={(e)=>this.handleInput('title', e)} required/>
             </div>
 
             <div className="form-group">
-              <label>Image:</label>
+              <label><h4>Image <span style={{ fontWeight: '400' }}>(Optional):</span></h4></label>
               <input type="file" onChange={(e)=>this.handleInput('image', e)}/>
             </div>
             
             <div className="form-group">
-              <label>Version:</label>
-              <input className="form-control" type="text" onChange={(e)=>this.handleInput('description', e)}></input>
+              <label><h4>Version:</h4></label>
+              <input className="form-control" type="text" onChange={(e)=>this.handleInput('description', e)}/>
             </div>
             
-            <label>User Interface</label>
+            <div className="form-group">
+              <label><h4>Notes <span style={{ fontWeight: '400' }}>(Optional)</span>:</h4></label>
+              <textarea className="form-control" rows="3" onChange={(e)=>this.handleInput('notes', e)}></textarea>
+            </div>
+            
+            <h4>Ratings:</h4>
+            <hr style={{ width: '40%', marginLeft: '0' }}/>
+            <label><h5>User Interface:</h5></label>
             <select className="form-control" style={createPriceStyle} type="number" value="3" onChange={(e)=>this.handleRating('user_interface', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
@@ -97,7 +106,7 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
-            <label>Speed/Size</label>
+            <label><h5>Speed/Size:</h5></label>
             <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
@@ -106,7 +115,7 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
-            <label>Software</label>
+            <label><h5>Software:</h5></label>
             <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('software', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
@@ -115,7 +124,7 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
-            <label>Security</label>
+            <label><h5>Security:</h5></label>
             <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('administration', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
@@ -124,7 +133,7 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
-            <label>Support</label>
+            <label><h5>Support:</h5></label>
             <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('support', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
@@ -133,8 +142,10 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
+            <hr style={{ width: '40%', margin: '30px 0 10px' }}/>
+
             <div className="form-group" style={createPriceStyle}>
-              <label>Would you recommend?</label>
+              <label><h5>Would you recommend?</h5></label>
               <select className="form-control" type="number" onChange={(e)=>this.handleInput('availability', e)}>
                 <option value="1">Yes</option>
                 <option value="0">No</option>

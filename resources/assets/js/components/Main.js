@@ -6,6 +6,8 @@ import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
 import Register from './Register';
 import Login from './Login';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 import Home from './Home';
 
 import axios from 'axios';
@@ -30,7 +32,8 @@ export default class Main extends Component {
             : {},
             token: localStorage["appState"]
                 ? JSON.parse(localStorage["appState"]).user.auth_token
-                : ""
+                : "",
+            resetTokenValid: false
         }
 
         this.handlePageClick = this.handlePageClick.bind(this);
@@ -47,24 +50,44 @@ export default class Main extends Component {
         this._loginUser = this._loginUser.bind(this);
         this._registerUser = this._registerUser.bind(this);
         this._logoutUser = this._logoutUser.bind(this);
+        this._forgotPassword = this._forgotPassword.bind(this);
+        this._resetPassword = this._resetPassword.bind(this);
     }
 
-    componentDidUpdate() {
+    componentWillMount() {
         if (
             !this.state.isLoggedIn &&
             this.props.location.pathname !== "/login" &&
-            this.props.location.pathname !== "/register"
+            this.props.location.pathname !== "/register" &&
+            this.props.location.pathname !== "/forgot-password" &&
+            this.props.location.pathname !== "/reset-password"
         ) {
-            console.log("Redirecting to login");
-            this.props.history.push("/login");
+            this.props.history.replace("/login");
         }
-
+        
         if (
             this.state.isLoggedIn &&
-            (this.props.location.pathname === "/login" ||
-                this.props.location.pathname === "/register")
+            (this.props.location.pathname === "/login" || this.props.location.pathname === "/register")
         ) {
-            console.log("Redirecting to dashboard");
+            this.props.history.replace("/");
+        }
+    }
+
+    componentWillUpdate() {
+        if (
+            !this.state.isLoggedIn &&
+            this.props.location.pathname !== "/login" &&
+            this.props.location.pathname !== "/register" &&
+            this.props.location.pathname !== "/forgot-password" &&
+            this.props.location.pathname !== "/reset-password"
+        ) {
+            this.props.history.push("/login");
+        }
+        
+        if (
+            this.state.isLoggedIn &&
+            (this.props.location.pathname === "/login" || this.props.location.pathname === "/register")
+        ) {
             this.props.history.push("/");
         }
     }
@@ -86,9 +109,35 @@ export default class Main extends Component {
             this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });            
         } else {            
             this.setState({ isLoggedIn: false, user: {}, token: '' });
-        }        
-    }
+        }
 
+        const resetToken = this.props.location.search.replace('?token=', '');
+        
+        if (resetToken) {
+            axios.get(`/api/password/find/${resetToken}`)
+            .then(response => {
+                return response;
+            })
+            .then(json => {                  
+                if (json.data.success) {
+                    this.state.resetTokenValid = true;
+                    this.props.history.push(`/forgot-password?token=${resetToken}`);
+                } else {
+                    this.props.history.replace("/forgot-password?token=invalid");
+                }
+            })
+            .catch(() => {
+                this.props.history.replace("/forgot-password?token=invalid");
+            });
+        }
+
+
+        if (this.state.resetTokenValid === false && this.props.location.pathname === "/reset-password") {
+            this.props.history.replace("/forgot-password?token=invalid");
+        }
+}
+
+    // List Functions
     listProducts() {
         const listStyle = {
             listStyle: 'none',
@@ -100,11 +149,16 @@ export default class Main extends Component {
             borderRight: '0'
         }
 
-        const { products, currentPage, productsPerPage } = this.state;
+        const { products, productsPerPage } = this.state;
+        let { currentPage } = this.state;
+
+        if (currentPage > Math.ceil(products.length / productsPerPage)) {
+            currentPage -= 1;
+        }
 
         const indexOfLastProduct = currentPage * productsPerPage;
         const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);        
+        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);   
 
         const renderProducts = currentProducts.map((product) => {
             return (
@@ -165,43 +219,43 @@ export default class Main extends Component {
         return (
             <div>
                 <ul className="list-group" style={{ marginBottom: '0' }}>
-                {renderProducts}
-            </ul>
-            { this.state.products.length > 15 ? (
-                <nav style={{ textAlign: 'center' }}>
-                    <ul className="pagination">
-                        { currentPage === 1 ? (
-                            <li className="disabled">
-                                <span>
-                                    <span aria-hidden="true">&laquo;</span>
-                                </span>
-                            </li>
-                        ) : (
-                            <li>
-                                <a href="#!" aria-label="Previous" onClick={this.handlePrevClick}>
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        ) }
-                        {renderPageNumbers}
-                        { currentPage === pageNumbers.length ? (
-                            <li className="disabled">
-                                <span>
-                                    <span aria-hidden="true">&raquo;</span>
-                                </span>
-                            </li>
-                        ) : (
-                            <li>
-                                <a href="#!" aria-label="Next" onClick={this.handlePrevClick}>
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        ) }
-                    </ul>
-                </nav>
-            ) : (
-                <div/>
-            ) }
+                    {renderProducts}
+                </ul>
+                { this.state.products.length > 15 ? (
+                    <nav style={{ textAlign: 'center' }}>
+                        <ul className="pagination">
+                            { currentPage === 1 ? (
+                                <li className="disabled">
+                                    <span>
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                            ) : (
+                                <li>
+                                    <a href="#!" aria-label="Previous" onClick={this.handlePrevClick}>
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            ) }
+                            {renderPageNumbers}
+                            { currentPage === pageNumbers.length ? (
+                                <li className="disabled">
+                                    <span>
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                            ) : (
+                                <li>
+                                    <a href="#!" aria-label="Next" onClick={this.handlePrevClick}>
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            ) }
+                        </ul>
+                    </nav>
+                ) : (
+                    <div/>
+                ) }
             </div>
         )
     }
@@ -288,6 +342,7 @@ export default class Main extends Component {
         });
     }
 
+    // Product Functions
     renderReviewForm() {
         this.setState({ newReviewForm: true });
     }
@@ -315,6 +370,7 @@ export default class Main extends Component {
         }
 
         formData.append("description", product.description);
+        formData.append("notes", product.notes);
         formData.append("user_interface", product.user_interface);
         formData.append("speed_size", product.speed_size);
         formData.append("software", product.software);
@@ -425,6 +481,7 @@ export default class Main extends Component {
         this.setState({ editBtnClicked: false });
     }
 
+    // User Functions
     _loginUser(email, password) {
         $(".email-login-btn")
             .attr("disabled", "disabled")
@@ -437,11 +494,9 @@ export default class Main extends Component {
         formData.append("password", password);
         formData.append("token_expire", this.setTokenExpire());        
 
-        axios
-            .post("api/user/login/", formData)
-            .then(response => {
+        axios.post("api/user/login/", formData)
+        .then(response => {
             return response;
-            
         })
         .then(json => {
             if (json.data.success) {
@@ -470,8 +525,6 @@ export default class Main extends Component {
                 alert("Login Failed!");
             } 
 
-            
-
             $("#login-form button")
                 .removeAttr("disabled")
                 .html("Login");
@@ -482,6 +535,71 @@ export default class Main extends Component {
                 .html("Login");
         });
     };
+
+    _forgotPassword(email) {
+        $(".forgot-password-btn")
+            .attr("disabled", "disabled")
+            .html(
+            '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>'
+        );
+
+        var formData = new FormData();
+        formData.append("email", email);
+
+        var object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
+        var json = JSON.stringify(object);
+
+        axios({
+            method: 'post',
+            url: 'api/password/create',
+            data: json,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            return response;
+        })
+        .then(json => {
+            console.log(json);
+            
+            if (json.data.success) {
+                alert('Email Sent!');
+            } else {
+                alert("Email could not send!");
+            } 
+
+            $("#login-form button")
+                .removeAttr("disabled")
+                .html("Login");
+        })
+        .catch(error => {
+            alert('Error, check logs!');
+            console.log(error);
+
+            $("#login-form button")
+                .removeAttr("disabled")
+                .html("Login");
+        });
+    }
+
+    _resetPassword() {
+        $(".forgot-password-btn")
+            .attr("disabled", "disabled")
+            .html(
+            '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>'
+        );
+
+        const token = window.location.search.replace('?token=', '');        
+
+        
+
+        
+    }
 
     _registerUser(name, email, password) {
         $(".email-login-btn")
@@ -532,10 +650,22 @@ export default class Main extends Component {
             }
         })
         .catch(errors => {
-            if (typeof errors.response.data.errors.password !== 'undefined') {
-                alert(errors.response.data.errors.password[0]);
+            if (typeof errors.response.data.errors.name !== 'undefined') {
+                if (typeof errors.response.data.errors.email !== 'undefined') {
+                    if (typeof errors.response.data.errors.password !== 'undefined') {
+                        alert(errors.response.data.errors.name[0] + "\n" + errors.response.data.errors.email[0] + "\n" +  errors.response.data.errors.password[0]);
+                    } else {
+                        alert(errors.response.data.errors.name[0] + "\n" + errors.response.data.errors.email[0]);
+                    }
+                } else {
+                    alert(errors.response.data.errors.name[0]);
+                }
             } else if (typeof errors.response.data.errors.email !== 'undefined') {
-                alert(errors.response.data.errors.email[0]);
+                if (typeof errors.response.data.errors.password !== 'undefined') {
+                    alert(errors.response.data.errors.email[0] + "\n" +  errors.response.data.errors.password[0]);
+                } else {
+                    alert(errors.response.data.errors.email[0]);
+                }
             } else if (typeof errors.response.data.errors.password !== 'undefined') {
                 alert(errors.response.data.errors.password[0]);
             }
@@ -565,13 +695,6 @@ export default class Main extends Component {
     };
     
     render() {
-        const divStyle = {
-            height: '100%',
-            background: '#f0f0f0',
-            padding: '10px 15px',
-            margin: '30px 0 30px 0'
-        }
-
         return (
             <div>
                 <nav className="navbar text-center" style={{ background: '#424242', borderBottom: '2px solid #3097D1', borderRadius: '0' }}>
@@ -625,6 +748,23 @@ export default class Main extends Component {
                     </div>
                     
                     <Switch data="data">
+                        <Route exact path="/" render={props => (
+                            <div className="col-xs-12 col-md-4 col-md-push-3">
+                                { this.state.isLoggedIn ? (
+                                    <Home
+                                        {...props}
+                                        logoutUser={this._logoutUser}
+                                        renderReviewForm={this.renderReviewForm}
+                                        user={this.state.user}
+                                        products={this.state.products}
+                                        handleClick={this.handleClick}
+                                    />
+                                ) : (
+                                    <div/>
+                                )}
+                            </div>
+                        )}/>
+
                         <Route
                             path="/login"
                             render={ props => <Login {...props} loginUser={this._loginUser}/> }
@@ -634,18 +774,21 @@ export default class Main extends Component {
                             path="/register"
                             render={ props => <Register {...props} registerUser={this._registerUser}/> }
                         />
+
+                        <Route
+                            path="/forgot-password"
+                            render={ props => <ForgotPassword {...props} forgotPassword={this._forgotPassword}/> }
+                        />
                         
-                        <Route exact path="/" render={props => (
-                            <div className="col-xs-12 col-md-4 col-md-push-3">
-                                <Home
-                                    {...props}
-                                    logoutUser={this._logoutUser}
-                                    renderReviewForm={this.renderReviewForm}
-                                    user={this.state.user}
-                                    products={this.state.products}
+                        <Route
+                            path="/reset-password"
+                            render={ 
+                                props => <ResetPassword 
+                                    {...props} 
+                                    resetPassword={this._resetPassword}
                                 />
-                            </div>
-                        )}/>
+                            }
+                        />
                     </Switch>
 
                     <div className="reorder-xs">
@@ -656,7 +799,7 @@ export default class Main extends Component {
                                 </div>
                                 <div className="panel-body text-center">
                                     <p>
-                                        View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories based on UI, speed/size, software, support and system administration.
+                                        View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories: UI, speed/size, software, support and system administration.
                                     </p>
                                     <h2 style={{ margin: '10px 0 0' }}>
                                         <i className="fa fa-github" aria-hidden="true"></i>
@@ -671,7 +814,6 @@ export default class Main extends Component {
                                     <h5 className="text-center">OS Reviews &copy; 2019</h5>
                                 </div>
                             </div>
-
 
                             <div className="text-center">
                                 <h4 style={{ marginBottom: '15px' }}>Contribute to future development:</h4>

@@ -12,20 +12,19 @@ class Home extends React.Component {
 
     this.state = {
       token: localStorage["appState"]
-      ? JSON.parse(localStorage["appState"]).user.auth_token
-      : "",
-      user: {}
+        ? JSON.parse(localStorage["appState"]).user.auth_token
+        : "",
+      user: {},
+      currentPage: 1,
+      productsPerPage: 3
     };
+
+    this.handlePageClick = this.handlePageClick.bind(this);
+    this.handlePrevClick = this.handlePrevClick.bind(this);
+    this.handleNextClick = this.handleNextClick.bind(this);
   }
 
   renderUserReviews() {
-    const listStyle = {
-      listStyle: 'none',
-      fontSize: '18px',
-      lineHeight: '1.8em',
-      paddingLeft: '1em'
-    }
-
     let hasReviews = this.props.products.filter((product) => {
       if (product.posted_by === this.state.user.name) {
         return product;
@@ -33,18 +32,68 @@ class Home extends React.Component {
     }).length > 0;    
 
     if (hasReviews) {
-      return this.props.products.filter((product) => {
+      const usersProducts = this.props.products.filter((product) => {
         if (product.posted_by === this.state.user.name) {
           return product;
         }
-      }).map((product) => {
+      });      
+
+      const { productsPerPage } = this.state;
+      let { currentPage } = this.state;
+
+      if (currentPage > Math.ceil(usersProducts.length / productsPerPage)) {
+          currentPage -= 1;
+      }
+
+      const indexOfLastProduct = currentPage * productsPerPage;
+      const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+      const currentProducts = usersProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+      const pageNumbers = [];
+
+      for (let i = 1; i <= Math.ceil(usersProducts.length / productsPerPage); i++) {
+          pageNumbers.push(i);
+      }
+
+      const renderPageNumbers = pageNumbers.map(number => {
+        var newPageKey = `${number} (User)`;
+
+        if (currentPage === number) {
+            return (
+                <li
+                    key={newPageKey}
+                    id={number}
+                    className="active"
+                    onClick={this.handlePageClick}
+                >
+                    <span href="#all-reviews">
+                        {number}
+                    </span>
+                </li>
+            )
+        }
+
+        return (
+        <li
+            key={newPageKey}
+            id={number}
+            onClick={this.handlePageClick}
+        >
+            <a href="#all-reviews">
+                {number}
+            </a>
+        </li>
+        );
+      });
+      
+      const renderCurrentPage = currentProducts.map((product) => {
         var newKey = `${product.title} (User)`;
   
         return (
           <li 
             className="list-group-item"
             style={{ width: '90%', margin: '0 auto' }}
-            onClick={() =>this.handleClick(product)} 
+            onClick={() =>this.props.handleClick(product)} 
             key={newKey}
           >
             <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4>
@@ -59,17 +108,79 @@ class Home extends React.Component {
           </li>
         );
       });
-    }
 
+      return (
+        <div>
+          <ul>
+            {renderCurrentPage}
+          </ul>
+          { usersProducts.length > 3 ? (
+              <nav style={{ textAlign: 'center' }}>
+                  <ul className="pagination">
+                      { currentPage === 1 ? (
+                          <li className="disabled">
+                              <span>
+                                  <span aria-hidden="true">&laquo;</span>
+                              </span>
+                          </li>
+                      ) : (
+                          <li>
+                              <a href="#!" aria-label="Previous" onClick={this.handlePrevClick}>
+                                  <span aria-hidden="true">&laquo;</span>
+                              </a>
+                          </li>
+                      ) }
+                      {renderPageNumbers}
+                      { currentPage === pageNumbers.length ? (
+                          <li className="disabled">
+                              <span>
+                                  <span aria-hidden="true">&raquo;</span>
+                              </span>
+                          </li>
+                      ) : (
+                          <li>
+                              <a href="#!" aria-label="Next" onClick={this.handlePrevClick}>
+                                  <span aria-hidden="true">&raquo;</span>
+                              </a>
+                          </li>
+                      ) }
+                  </ul>
+              </nav>
+            ) : (
+              <div/>
+            ) }
+        </div>
+      )
+    }
     return (
-      <li 
-          id="no-user-reviews"
-          className="list-group-item"
-          style={{ width: '70%', margin: '0 auto' }}
-        >
-          <h4>No posts</h4>
-      </li>
+      <ul>
+        <li 
+            id="no-user-reviews"
+            className="list-group-item"
+            style={{ width: '70%', margin: '0 auto' }}
+          >
+            <h4>No posts</h4>
+        </li>
+      </ul>
     )
+  }
+
+  handlePageClick(event) {
+    this.setState({
+        currentPage: Number(event.currentTarget.id)
+    });
+  }
+
+  handleNextClick() {
+      this.setState({
+          currentPage: this.state.currentPage + 1
+      });
+  }
+  
+  handlePrevClick() {
+      this.setState({
+          currentPage: this.state.currentPage - 1
+      });
   }
 
   componentDidMount() {
@@ -99,9 +210,7 @@ class Home extends React.Component {
             </div>
             <hr style={{ width: '80%' }}/>
             <h4>My Reviews:</h4>
-            <ul>
-              {this.renderUserReviews()}
-            </ul>
+            {this.renderUserReviews()}
             <button
                 className="btn btn-success"
                 onClick={this.props.renderReviewForm}

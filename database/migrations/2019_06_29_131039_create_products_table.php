@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->string('title');
             $table->longText('image');
             $table->text('description');
+            $table->longText('notes');
             $table->integer('user_interface');
             $table->integer('speed_size');
             $table->integer('software');

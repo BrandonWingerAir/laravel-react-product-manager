@@ -104,6 +104,21 @@ const Product = props => {
 
         <hr style={{ width: '60%' }}/>
 
+        { product.notes ? (
+          <div>
+              <div className="well text-left" style={{ width: '88%', margin: '0 auto' }}>
+              <p>
+                {product.notes}
+              </p>
+            </div>
+
+            <hr style={{ width: '60%' }}/>
+          </div>
+        ) : (
+          <div/>
+        )}
+
+        <h3>Ratings:</h3>
         <h4><b>Software:</b> {product.software} / 5</h4>
         <h4><b>User Interface:</b> {product.user_interface} / 5</h4>
         <h4><b>Speed/Size:</b> {product.speed_size} / 5</h4>
@@ -112,8 +127,10 @@ const Product = props => {
         
         { product.posted_by === user.name ? (
           <div>
-            <hr/>
-            <input className="btn btn-info" style={{ margin: '0 10px' }} type="button" value="Edit" onClick={e => handleEdit()}/>
+            <hr style={{ width: '45%' }}/>
+            <button className="btn btn-info" style={{ margin: '0 10px' }} type="button" onClick={e => handleEdit()}>
+              Edit <i className="fa fa-pencil-square-o" style={{ marginLeft: '2px' }} aria-hidden="true"></i>
+            </button>
             <input className="btn btn-danger" style={{ margin: '0 10px' }} type="button" value="Delete" onClick={e => handleDeleteConfirm()}/>
           </div>
         ) : (
@@ -132,7 +149,7 @@ const Product = props => {
             </div>
             <div>
               <ul id="new-products" className="list-group" style={{ marginBottom: '0' }}>
-                { renderNewProducts(5) }
+                { renderNewProducts(3) }
               </ul>
             </div>
           </div>

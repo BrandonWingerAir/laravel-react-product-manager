@@ -37,6 +37,10 @@ const Login = ({ history, loginUser = f => f }) => {
             <Link to="/register" style={{ color: '#636b6f' }}>
               Register
             </Link>
+
+            <Link to="/forgot-password" className="center-block" style={{ color: '#636b6f' }}>
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </div>
