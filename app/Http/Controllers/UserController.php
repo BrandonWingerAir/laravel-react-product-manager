@@ -34,10 +34,18 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+            'password' => 'required|min:8'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
+        }
+
         $user = \App\User::where('email', $request->email)->get()->first();
 
-        if ($user && \Hash::check($request->password, $user->password))
-        {
+        if ($user && \Hash::check($request->password, $user->password)) {
             $token = self::getToken($request->email, $request->password);
             $user->auth_token = $token;
             $user->token_expire = $request->token_expire;
@@ -49,11 +57,10 @@ class UserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
             ]];
-        }
-        else
-            $response = ['success' => false, 'data' => 'Record does not exist'];
 
-        return response()->json($response, 201);
+            return response()->json($response, 201);
+        }
+        return response()->json(['success' => false, 'errors' => 'Incorrect password.', 'data' => 'Incorrect password!'], 422);
     }
 
     public function register(Request $request)
@@ -65,7 +72,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'error' => 'Username or email already registered!'], 422);
+            return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
         }
 
         $payload = [

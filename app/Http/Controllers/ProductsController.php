@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProductsController extends Controller
 {
@@ -26,12 +27,14 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'title'         => 'required|unique:products|max:255',
-            'description'   => 'required',
-            'price'         => 'integer',
-            'availability'  => 'boolean'
+        $validator = Validator::make($request->all(), [
+            'title'         => 'required|max:20',
+            'description'   => 'required'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
+        }
 
         if ($request->hasFile('image')) {
             $request->image->store('public/images');
@@ -67,6 +70,15 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {   
+        $validator = Validator::make($request->all(), [
+            'title'         => 'required|max:20',
+            'description'   => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
+        }
+
         $product = Product::findOrFail($id);
 
         if($request->hasFile('image')) {

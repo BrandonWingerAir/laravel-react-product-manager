@@ -219,7 +219,7 @@ class Home extends React.Component {
               Add New
             </button>
             <button
-              className="btn btn-info"
+              className="btn btn-primary"
               onClick={this.props.logoutUser}
               style={{ margin: '0 10px' }}
             >

@@ -28,7 +28,7 @@ export default class Main extends Component {
             ? JSON.parse(localStorage["appState"]).isLoggedIn
             : false,
             user: localStorage["appState"]
-            ? (localStorage["appState"]).user
+            ? JSON.parse(localStorage["appState"]).user
             : {},
             token: localStorage["appState"]
                 ? JSON.parse(localStorage["appState"]).user.auth_token
@@ -54,7 +54,7 @@ export default class Main extends Component {
         this._resetPassword = this._resetPassword.bind(this);
     }
 
-    componentWillMount() {
+    componentWillMount() {     
         if (
             !this.state.isLoggedIn &&
             this.props.location.pathname !== "/login" &&
@@ -135,12 +135,14 @@ export default class Main extends Component {
         })
         .then(products => {
             this.setState({ products });
-        })
+        });        
 
         if (this.state.user) {
             if (Date.parse(new Date()) > Date.parse(this.state.user.token_expire)) {
                 this.setState({ isLoggedIn: false, user: {}, token: '' });
             }
+        } else {
+            this.state.isLoggedIn = false;
         }
     }
 
@@ -365,13 +367,21 @@ export default class Main extends Component {
     }
 
     handleAddProduct(product) {
+        if (this.state.user) {
+            if (Date.parse(new Date()) > Date.parse(this.state.user.token_expire)) {
+                this.setState({ isLoggedIn: false, user: {}, token: '' });
+            }
+        } else {
+            this.state.isLoggedIn = false;
+        }
+
         product.user_interface = Number(product.user_interface);
         product.speed_size = Number(product.speed_size);
         product.software = Number(product.software);
         product.support = Number(product.support);
         product.administration = Number(product.administration);
-        product.rating = Number(product.rating);
-        product.availability = Number(product.availability);
+        product.rating = parseFloat(product.rating);
+        product.availability = Number(product.availability);        
 
         var formData = new FormData();
         formData.append("title", product.title);
@@ -380,15 +390,18 @@ export default class Main extends Component {
             formData.append("image", product.image, product.image.name);
         }
 
+        if (product.notes) {
+            formData.append("notes", product.notes);
+        }
+
         formData.append("description", product.description);
-        formData.append("notes", product.notes);
         formData.append("user_interface", product.user_interface);
         formData.append("speed_size", product.speed_size);
         formData.append("software", product.software);
         formData.append("support", product.support);
         formData.append("administration", product.administration);
         formData.append("rating", product.rating);
-        formData.append("availability", product.availability);
+        formData.append("availability", product.availability);        
 
         axios({
             method:'post',
@@ -408,6 +421,55 @@ export default class Main extends Component {
                 newReviewForm: false,
                 currentProduct: data.data
             }));
+        })
+        .catch(errors => {        
+            
+            console.log(errors.response);
+            
+            $("#add-new-btn")
+                .removeAttr("disabled")
+                .html("Submit");
+
+            if (typeof errors.response.data.errors.title !== 'undefined') {
+                if (typeof errors.response.data.errors.description !== 'undefined') {
+                    $('.title-error').addClass('has-error');
+                    $('.version-error').addClass('has-error');
+
+                    $('#title-error-text').html(`
+                        <li>${errors.response.data.errors.title[0]}</li>
+                    `);
+
+                    $('#version-error-text').html(`
+                        <li>${errors.response.data.errors.description[0]}</li>
+                    `);
+
+                    $('html, body').animate({
+                        scrollTop: $(".product-form").offset().top
+                    }, 1000);
+                } else {
+                    $('.title-error').addClass('has-error');
+                    $('.version-error').removeClass('has-error');
+
+                    $('#title-error-text').html(`
+                        <li>${errors.response.data.errors.title[0]}</li>
+                    `);
+
+                    $('html, body').animate({
+                        scrollTop: $(".product-form").offset().top
+                    }, 1000);
+                }
+            } else if (typeof errors.response.data.errors.description !== 'undefined') {
+                $('.title-error').removeClass('has-error');
+                $('.version-error').addClass('has-error');
+
+                $('#version-error-text').html(`
+                    <li>${errors.response.data.errors.description[0]}</li>
+                `);
+
+                $('html, body').animate({
+                    scrollTop: $("#title-error-text").offset().top
+                }, 1000);
+            }
         });
     }
 
@@ -436,7 +498,15 @@ export default class Main extends Component {
         this.setState({ editBtnClicked: true });
     }
 
-    handleUpdate(product) {    
+    handleUpdate(product) {
+        if (this.state.user) {
+            if (Date.parse(new Date()) > Date.parse(this.state.user.token_expire)) {
+                this.setState({ isLoggedIn: false, user: {}, token: '' });
+            }
+        } else {
+            this.state.isLoggedIn = false;
+        }
+
         product.user_interface = Number(product.user_interface);
         product.speed_size = Number(product.speed_size);
         product.software = Number(product.software);
@@ -540,10 +610,43 @@ export default class Main extends Component {
                 .removeAttr("disabled")
                 .html("Login");
         })
-        .catch(error => {
+        .catch(errors => {
             $("#login-form button")
                 .removeAttr("disabled")
                 .html("Login");
+
+            if (typeof errors.response.data.errors.email !== 'undefined') {
+                if (typeof errors.response.data.errors.password !== 'undefined') {
+                    $('.email-error').addClass('has-error');
+                    $('.password-error').addClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.email[0]}</li>
+                        <li>${errors.response.data.errors.password[0]}</li>
+                    `);
+                } else {
+                    $('.email-error').addClass('has-error');
+                    $('.password-error').removeClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.email[0]}</li>
+                    `);
+                }
+            } else if (typeof errors.response.data.errors.password !== 'undefined') {
+                $('.email-error').removeClass('has-error');
+                $('.password-error').addClass('has-error');
+
+                $('.form-errors').html(`
+                    <li>${errors.response.data.errors.password[0]}</li>
+                `);
+            } else if (typeof errors.response.data.errors !== 'undefined') {
+                $('.email-error').removeClass('has-error');
+                $('.password-error').addClass('has-error');
+
+                $('.form-errors').html(`
+                    <li>${errors.response.data.errors}</li>
+                `);
+            }
         });
     };
 
@@ -737,25 +840,70 @@ export default class Main extends Component {
             if (typeof errors.response.data.errors.name !== 'undefined') {
                 if (typeof errors.response.data.errors.email !== 'undefined') {
                     if (typeof errors.response.data.errors.password !== 'undefined') {
+                        $('#name-error').addClass('has-error');
+                        $('.email-error').addClass('has-error');
+                        $('.password-error').addClass('has-error');
+
                         $('.form-errors').html(`
                             <li>${errors.response.data.errors.name[0]}</li>
                             <li>${errors.response.data.errors.email[0]}</li>
                             <li>${errors.response.data.errors.password[0]}</li>
                         `);
                     } else {
-                        alert(errors.response.data.errors.name[0] + "\n" + errors.response.data.errors.email[0]);
+                        $('#name-error').addClass('has-error');
+                        $('.email-error').addClass('has-error');
+                        $('.password-error').removeClass('has-error');
+
+                        $('.form-errors').html(`
+                            <li>${errors.response.data.errors.name[0]}</li>
+                            <li>${errors.response.data.errors.email[0]}</li>
+                        `);
                     }
+                } else if (typeof errors.response.data.errors.password !== 'undefined') {
+                    $('#name-error').addClass('has-error');
+                    $('.email-error').removeClass('has-error');
+                    $('.password-error').addClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.name[0]}</li>
+                        <li>${errors.response.data.errors.password[0]}</li>
+                    `);
                 } else {
-                    alert(errors.response.data.errors.name[0]);
+                    $('#name-error').addClass('has-error');
+                    $('.email-error').removeClass('has-error');
+                    $('.password-error').removeClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.name[0]}</li>
+                    `);
                 }
             } else if (typeof errors.response.data.errors.email !== 'undefined') {
                 if (typeof errors.response.data.errors.password !== 'undefined') {
-                    alert(errors.response.data.errors.email[0] + "\n" +  errors.response.data.errors.password[0]);
+                    $('#name-error').removeClass('has-error');
+                    $('.email-error').addClass('has-error');
+                    $('.password-error').addClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.email[0]}</li>
+                        <li>${errors.response.data.errors.password[0]}</li>
+                    `);
                 } else {
-                    alert(errors.response.data.errors.email[0]);
+                    $('#name-error').removeClass('has-error');
+                    $('.email-error').addClass('has-error');
+                    $('.password-error').removeClass('has-error');
+
+                    $('.form-errors').html(`
+                        <li>${errors.response.data.errors.email[0]}</li>
+                    `);
                 }
             } else if (typeof errors.response.data.errors.password !== 'undefined') {
-                alert(errors.response.data.errors.password[0]);
+                $('#name-error').removeClass('has-error');
+                $('.email-error').removeClass('has-error');
+                $('.password-error').addClass('has-error');
+
+                $('.form-errors').html(`
+                    <li>${errors.response.data.errors.password[0]}</li>
+                `);
             }
             
             $(".email-login-btn")

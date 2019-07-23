@@ -22,19 +22,21 @@ const Login = ({ history, loginUser = f => f }) => {
           </div>
 
           <div className="panel-body">
-            <div className="form-group">
+            <div className="form-group email-error">
               <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email"  className="form-control center-block" placeholder="Email" style={inputStyle}/>
             </div>
             
-            <div className="form-group">
+            <div className="form-group password-error">
               <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" placeholder="Password" style={inputStyle}/>
             </div>
+
+            <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
 
             <button type="submit" className="btn btn-primary center-block email-login-btn" style={{ margin: '20px auto 10px' }} href="#!">
               Login
             </button>
 
-            <Link to="/register" style={{ color: '#636b6f' }}>
+            <Link to="/register" className="btn btn-info">
               Register
             </Link>
 

@@ -74,21 +74,25 @@ class AddProduct extends Component {
         <div style={divStyle}> 
           <h2>New Product</h2>
           <hr/>
-          <form onSubmit={this.handleSubmit} encType="multipart/form-data">
-            <div className="form-group">
+          <form className="product-form" onSubmit={this.handleSubmit} encType="multipart/form-data">
+            <div className="form-group title-error">
               <label><h4>Title:</h4></label>
-              <input className="form-control" type="text" onChange={(e)=>this.handleInput('title', e)} required/>
+              <input className="form-control" type="text" onChange={(e)=>this.handleInput('title', e)}/>
             </div>
+
+            <ul id="title-error-text" className="text-danger" style={{ listStyle: 'none' }}></ul>
 
             <div className="form-group">
               <label><h4>Image <span style={{ fontWeight: '400' }}>(Optional):</span></h4></label>
               <input type="file" onChange={(e)=>this.handleInput('image', e)}/>
             </div>
             
-            <div className="form-group">
+            <div className="form-group version-error">
               <label><h4>Version:</h4></label>
               <input className="form-control" type="text" onChange={(e)=>this.handleInput('description', e)}/>
             </div>
+
+            <ul id="version-error-text" className="text-danger" style={{ listStyle: 'none' }}></ul>
             
             <div className="form-group">
               <label><h4>Notes <span style={{ fontWeight: '400' }}>(Optional)</span>:</h4></label>
@@ -152,7 +156,9 @@ class AddProduct extends Component {
               </select>
             </div>
 
-            <input className="btn btn-primary" type="submit" value="Submit"/>
+            <button id="add-new-btn" className="btn btn-primary" type="submit" >
+              Submit
+            </button>
           </form>
         </div>
       </div>

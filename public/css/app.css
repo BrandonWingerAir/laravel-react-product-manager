@@ -8345,7 +8345,7 @@ ul {
   padding-left: 0;
 }
 
-li:hover {
+li.list-group-item:hover {
   background-color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }

@@ -43,7 +43,8 @@ class ProductsTableSeeder extends Seeder
             }
 
             $device_version = $faker->unique()->numberBetween($min = 1, $max = 20) . '.'
-                . $faker->unique()->randomFloat($nbMaxDecimals = 4, $min = 0.01, $max = 99);
+                . $faker->unique()->numerify('##'). '.'
+                . $faker->unique()->numerify($min = 0, $max = 9999);
 
             Product::create([
                 'title' => $faker->unique()->devicePlatform,
@@ -55,7 +56,7 @@ class ProductsTableSeeder extends Seeder
                 'administration' => $administration,
                 'rating' => $rating,
                 'availability' => $availability,
-                'posted_by' => $faker->unique()->scientist
+                'posted_by' => 'Admin'
             ]);
         }
     }

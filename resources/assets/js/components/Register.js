@@ -22,25 +22,25 @@ const Register = ({ history, registerUser = f => f }) => {
           </div>
 
           <div className="panel-body">
-            <div className="form-group">
+            <div id="name-error" className="form-group">
               <input ref={input => (_name = input)} autoComplete="off" id="name-input" name="name" type="text" className="form-control center-block" style={inputStyle} placeholder="Name"/>
             </div>
 
-            <div className="form-group">
+            <div className="form-group email-error">
               <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email" className="form-control center-block" style={inputStyle} placeholder="Email"/>
             </div>
 
-            <div className="form-group">
+            <div className="form-group password-error">
               <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" style={inputStyle} placeholder="Password"/>
             </div>
 
-            <ul className="form-errors"></ul>
+            <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
 
             <button type="submit" className="btn btn-primary center-block text-center email-login-btn"style={{ marginBottom: '10px' }} href="#!">
               Register
             </button>
 
-            <Link to="/login" style={{ color: '#636b6f' }}>
+            <Link to="/login" className="btn btn-info">
               Login
             </Link>
           </div>
