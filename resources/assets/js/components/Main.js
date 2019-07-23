@@ -71,9 +71,37 @@ export default class Main extends Component {
         ) {
             this.props.history.replace("/");
         }
+
+        // Check password reset token
+        const urlParams = new URLSearchParams(window.location.search);
+        const resetToken = urlParams.get('token');
+
+        if (resetToken) {
+            axios.get(`/api/password/find/${resetToken}`)
+            .then(response => {
+                return response;
+            })
+            .then(json => {
+                if (json.data.success) {
+                    this.state.resetTokenValid = true;                    
+                    const user = json.data.user.email;
+                    this.props.history.push(`/reset-password?user=${user}&token=${resetToken}`);
+                } else {
+                    this.props.history.replace("/forgot-password?token=invalid");
+                }
+            })
+            .catch(() => {
+                this.props.history.replace("/forgot-password?token=invalid");
+            });
+        } else {
+            if (this.state.resetTokenValid === false && this.props.location.pathname === "/reset-password") {
+                
+                this.props.history.replace("/forgot-password?token=invalid");
+            }
+        }
     }
 
-    componentWillUpdate() {
+    componentDidUpdate() {
         if (
             !this.state.isLoggedIn &&
             this.props.location.pathname !== "/login" &&
@@ -90,6 +118,14 @@ export default class Main extends Component {
         ) {
             this.props.history.push("/");
         }
+
+        if (
+            this.state.isLoggedIn && 
+            !this.state.resetTokenValid && 
+            this.props.location.pathname === "/reset-password"
+        ) {
+            this.props.history.replace("/");            
+        }
     }
 
     componentDidMount() {
@@ -101,43 +137,14 @@ export default class Main extends Component {
             this.setState({ products });
         })
 
-        let state = localStorage["appState"];
-
-        let storedState = JSON.parse(state);
-
-        if (Date.parse(new Date()) < Date.parse(storedState.user.token_expire)) {
-            this.setState({ isLoggedIn: storedState.isLoggedIn, user: storedState.user, token: storedState.user.auth_token });            
-        } else {            
-            this.setState({ isLoggedIn: false, user: {}, token: '' });
+        if (this.state.user) {
+            if (Date.parse(new Date()) > Date.parse(this.state.user.token_expire)) {
+                this.setState({ isLoggedIn: false, user: {}, token: '' });
+            }
         }
+    }
 
-        const resetToken = this.props.location.search.replace('?token=', '');
-        
-        if (resetToken) {
-            axios.get(`/api/password/find/${resetToken}`)
-            .then(response => {
-                return response;
-            })
-            .then(json => {                  
-                if (json.data.success) {
-                    this.state.resetTokenValid = true;
-                    this.props.history.push(`/forgot-password?token=${resetToken}`);
-                } else {
-                    this.props.history.replace("/forgot-password?token=invalid");
-                }
-            })
-            .catch(() => {
-                this.props.history.replace("/forgot-password?token=invalid");
-            });
-        }
-
-
-        if (this.state.resetTokenValid === false && this.props.location.pathname === "/reset-password") {
-            this.props.history.replace("/forgot-password?token=invalid");
-        }
-}
-
-    // List Functions
+    // Full List Functions
     listProducts() {
         const listStyle = {
             listStyle: 'none',
@@ -149,8 +156,9 @@ export default class Main extends Component {
             borderRight: '0'
         }
 
-        const { products, productsPerPage } = this.state;
-        let { currentPage } = this.state;
+        let { products, productsPerPage, currentPage } = this.state;
+
+        products.sort((a, b) => a.title.localeCompare(b.title));        
 
         if (currentPage > Math.ceil(products.length / productsPerPage)) {
             currentPage -= 1;
@@ -188,6 +196,7 @@ export default class Main extends Component {
         }
 
         const renderPageNumbers = pageNumbers.map(number => {
+
             if (currentPage === number) {
                 return (
                     <li
@@ -204,15 +213,15 @@ export default class Main extends Component {
             }
 
             return (
-            <li
-                key={number}
-                id={number}
-                onClick={this.handlePageClick}
-            >
-                <a href="#all-reviews">
-                    {number}
-                </a>
-            </li>
+                <li
+                    key={number}
+                    id={number}
+                    onClick={this.handlePageClick}
+                >
+                    <a href="#all-reviews">
+                        {number}
+                    </a>
+                </li>
             );
         });
 
@@ -302,10 +311,12 @@ export default class Main extends Component {
             return stars;
         }
 
-        return this.state.products.slice(0).reverse().slice(0, limit).map((product) => {
-            var newKey = `${product.title} (New)`;
-            console.log(product.rating);
-            
+        let {products} = this.state;
+        
+        products.sort((a, b) => (a.id - b.id));
+
+        return products.reverse().slice(0, limit).map((product) => {
+            var newKey = `${product.title} (New)`;            
 
             return (
                 <li 
@@ -564,9 +575,7 @@ export default class Main extends Component {
         .then(response => {
             return response;
         })
-        .then(json => {
-            console.log(json);
-            
+        .then(json => {            
             if (json.data.success) {
                 alert('Email Sent!');
             } else {
@@ -587,18 +596,87 @@ export default class Main extends Component {
         });
     }
 
-    _resetPassword() {
+    _resetPassword(password, confirmPassword) {
         $(".forgot-password-btn")
             .attr("disabled", "disabled")
             .html(
             '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>'
         );
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('user');
+        const resetToken = urlParams.get('token'); 
+        
+        var formData = new FormData();
 
-        const token = window.location.search.replace('?token=', '');        
+        formData.append("email", email);
+        formData.append("token", resetToken);
+        formData.append("token_expire", this.setTokenExpire());
+        formData.append("password", password);
+        formData.append("password_confirmation", confirmPassword);
 
+        var object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
+        
+        var jsonData = JSON.stringify(object);
+
+        console.log(jsonData);
         
 
-        
+        axios({
+            method:'post',
+            url: `api/password/reset`,
+            data: jsonData,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {            
+            return response;
+            
+        })
+        .then(json => {
+            if (json.data.success) {
+                let userData = {
+                    name: json.data.user.name,
+                    id: json.data.user.id,
+                    email: json.data.user.email,
+                    auth_token: json.data.user.auth_token,
+                    token_expire: json.data.user.token_expire,
+                    timestamp: new Date().toString()
+                };
+
+                let appState = {
+                    isLoggedIn: true,
+                    user: userData
+                }
+
+                localStorage["appState"] = JSON.stringify(appState);
+
+                this.setState({
+                    isLoggedIn: appState.isLoggedIn,
+                    user: appState.user,
+                    token: appState.user.auth_token,
+                    resetTokenValid: false
+                });                
+            } else {
+                alert("Reset Failed!");
+            } 
+
+            $("#login-form button")
+                .removeAttr("disabled")
+                .html("Login");
+        })
+        .catch(error => {
+            alert(error)
+
+            $("#login-form button")
+                .removeAttr("disabled")
+                .html("Login");
+        });
     }
 
     _registerUser(name, email, password) {
@@ -619,7 +697,10 @@ export default class Main extends Component {
         .then(response => {
             return response;
         })
-        .then(json => {  
+        .then(json => {
+            console.log('JSON:');
+            console.log(json);
+            
             if (json.data[0].success) {
                 let userData = {
                     name: json.data[0].data.name,
@@ -629,6 +710,9 @@ export default class Main extends Component {
                     token_expire: json.data[0].data.token_expire,
                     timestamp: new Date().toString()
                 };
+
+                console.log('userData:');
+                console.log(userData);
 
                 let appState = {
                     isLoggedIn: true,
@@ -653,7 +737,11 @@ export default class Main extends Component {
             if (typeof errors.response.data.errors.name !== 'undefined') {
                 if (typeof errors.response.data.errors.email !== 'undefined') {
                     if (typeof errors.response.data.errors.password !== 'undefined') {
-                        alert(errors.response.data.errors.name[0] + "\n" + errors.response.data.errors.email[0] + "\n" +  errors.response.data.errors.password[0]);
+                        $('.form-errors').html(`
+                            <li>${errors.response.data.errors.name[0]}</li>
+                            <li>${errors.response.data.errors.email[0]}</li>
+                            <li>${errors.response.data.errors.password[0]}</li>
+                        `);
                     } else {
                         alert(errors.response.data.errors.name[0] + "\n" + errors.response.data.errors.email[0]);
                     }
@@ -779,13 +867,13 @@ export default class Main extends Component {
                             path="/forgot-password"
                             render={ props => <ForgotPassword {...props} forgotPassword={this._forgotPassword}/> }
                         />
-                        
                         <Route
                             path="/reset-password"
                             render={ 
                                 props => <ResetPassword 
                                     {...props} 
                                     resetPassword={this._resetPassword}
+                                    resetTokenValid={this.state.resetTokenValid}
                                 />
                             }
                         />
@@ -806,12 +894,7 @@ export default class Main extends Component {
                                     </h2>
                                 </div>
                                 <div className="panel-footer text-center">
-                                    <h4 style={{ margin: '5px 10px', verticalAlign: 'middle' }}>
-                                        Developed by Brandon Winger-Air
-                                    </h4> 
-                                    
-                                    <hr/>
-                                    <h5 className="text-center">OS Reviews &copy; 2019</h5>
+                                    <h5 className="text-center">Brandon Winger-Air &copy; 2019</h5>
                                 </div>
                             </div>
 

@@ -22,8 +22,10 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
           </div>
 
           <div className="panel-body">
-            { this.props.location.search === '?token=invalid' ? (
-              <span>Token has expired. Please re-send password reset email.</span>
+            { window.location.search === '?token=invalid' ? (
+              <div>
+                <p className="text-danger">Token has expired.</p>
+              </div>
             ) : (
               <div/>
             ) }

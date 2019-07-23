@@ -18,9 +18,9 @@ class CreateProductsTable extends Migration
             $table->string('posted_by');
             $table->timestamps();
             $table->string('title');
-            $table->longText('image');
+            $table->longText('image')->nullable();
             $table->text('description');
-            $table->longText('notes');
+            $table->longText('notes')->nullable();
             $table->integer('user_interface');
             $table->integer('speed_size');
             $table->integer('software');

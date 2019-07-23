@@ -42,9 +42,12 @@ class ProductsTableSeeder extends Seeder
                 $addVariety = true;
             }
 
+            $device_version = $faker->unique()->numberBetween($min = 1, $max = 20) . '.'
+                . $faker->unique()->randomFloat($nbMaxDecimals = 4, $min = 0.01, $max = 99);
+
             Product::create([
                 'title' => $faker->unique()->devicePlatform,
-                'description' => $faker->unique()->randomFloat($nbMaxDecimals = 1, $min = 0.1, $max = 20),
+                'description' => $device_version,
                 'user_interface' => $user_interface,
                 'speed_size' => $speed_size,
                 'software' => $software,

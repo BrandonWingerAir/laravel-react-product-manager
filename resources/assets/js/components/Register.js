@@ -34,6 +34,8 @@ const Register = ({ history, registerUser = f => f }) => {
               <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" style={inputStyle} placeholder="Password"/>
             </div>
 
+            <ul className="form-errors"></ul>
+
             <button type="submit" className="btn btn-primary center-block text-center email-login-btn"style={{ marginBottom: '10px' }} href="#!">
               Register
             </button>

@@ -8,9 +8,33 @@
   use App\Notifications\PasswordResetSuccess;
   use App\User;
   use App\PasswordReset;
+  use JWTAuth;
+  
 
   class PasswordResetController extends Controller
   {
+      private function getToken($user)
+      {
+          $token = null;
+
+          try {
+              if (!$token = JWTAuth::fromUser($user)) {
+                  return response()->json([
+                      'response' => 'error',
+                      'message' => 'Password or email is invalid',
+                      'token' => $token
+                  ]);
+              }
+          } catch (JWTAuthException $e) {
+              return response()->json([
+                  'response' => 'error',
+                  'message' => 'Token create failed',
+              ]);
+          }
+
+          return $token;
+      }
+
       /**
        * Create token password reset
        *
@@ -104,20 +128,31 @@
         if (!$passwordReset)
           return response()->json([
               'message' => 'This password reset token is invalid.'
-          ], 404);        
+          ], 404);
           
-        $user = User::where('email', $passwordReset->email)->first();        
+        $user = User::where('email', $passwordReset->email)->first();
         
-        if (!$user)
+        if ($user) {
+          $token = self::getToken($user);
+
+          $user->auth_token = $token;
+          $user->token_expire = $request->token_expire;
+          $user->password = bcrypt($request->password);
+
+          $user->save();        
+
+          $passwordReset->delete();
+
+          $user->notify(new PasswordResetSuccess($passwordReset));        
+          
           return response()->json([
-              'message' => 'We can\t find a user with that e-mail address.'
-          ], 404);        
-        
-        $user->password = bcrypt($request->password);
-        $user->save();        
-        $passwordReset->delete();        
-        $user->notify(new PasswordResetSuccess($passwordReset));        
-        
-        return response()->json($user);
+            'success' => true,
+            'user' => $user
+          ]);
+        } else {
+          return response()->json([
+            'message' => 'We can\t find a user with that e-mail address.'
+          ], 404);
+        }
       }
   }
