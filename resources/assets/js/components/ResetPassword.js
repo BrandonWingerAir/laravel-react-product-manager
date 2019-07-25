@@ -10,10 +10,7 @@ const ResetPassword = ({ history, resetPassword = f => f,  resetTokenValid}) => 
   };
 
 
-  const inputStyle = { width: '75%', marginBottom: '20px' }
-
-  console.log(resetTokenValid);
-  
+  const inputStyle = { width: '75%', marginBottom: '20px' }  
 
   if (resetTokenValid) {
     return (
@@ -27,16 +24,18 @@ const ResetPassword = ({ history, resetPassword = f => f,  resetTokenValid}) => 
             </div>
   
             <div className="panel-body">
-              <div className="form-group">
+              <div className="form-group password-error">
                 <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" placeholder="Password" style={inputStyle}/>
               </div>
   
-              <div className="form-group">
+              <div id="password-confirm" className="form-group password-error">
                 <input ref={input => (_confirmPassword = input)} autoComplete="off" id="confirm-password-input" name="password" type="password" className="form-control center-block" placeholder="Confirm Password" style={inputStyle}/>
               </div>
+
+              <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
   
-              <button type="submit" className="btn btn-primary center-block forgot-password-btn" style={{ margin: '20px auto 10px' }} href="#!">
-                Confirm
+              <button type="submit" className="btn btn-primary center-block form-btn" style={{ margin: '20px auto 10px' }} href="#!">
+                Submit
               </button>
   
               <Link to="/" style={{ color: '#636b6f' }}>

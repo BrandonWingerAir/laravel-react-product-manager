@@ -69,16 +69,7 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {   
-        $validator = Validator::make($request->all(), [
-            'title'         => 'required|max:20',
-            'description'   => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
-        }
-
+    {
         $product = Product::findOrFail($id);
 
         if($request->hasFile('image')) {

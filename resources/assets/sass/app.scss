@@ -44,6 +44,10 @@ input[type="submit"] {
   cursor: initial;
 }
 
+.user-review-list:last-of-type {
+  border-bottom: 1px solid #d3e0e9 !important;
+}
+
 @media screen and (max-width: '768px') {
   .reorder-xs {
     display: inline-block;
@@ -53,11 +57,27 @@ input[type="submit"] {
   .reorder-xs > [class*= "col-"] {
     transform: rotate(-180deg);
   }
+
+  .mobile-center {
+    text-align: center;
+  }
+
+  .mobile-margin {
+    margin-bottom: 30px;
+  }
 }
 
 @media screen and (min-width: '768px') {
   #all-reviews {
     position: absolute;
     top: 110px;
+  }
+
+  .form-option {
+    width: 30%;
+  }
+
+  #mobile-hr {
+    display: none;
   }
 }

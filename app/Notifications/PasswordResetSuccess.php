@@ -41,9 +41,8 @@ class PasswordResetSuccess extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->line('You are changed your password succeful.')
-            ->line('If you did change password, no further action is required.')
-            ->line('If you did not change password, please email contact@brandonwinger.com immediately.');
+            ->line('You changed your password successfully.')
+            ->line('If you did not change your password, please email contact@brandonwinger.com immediately.');
     }
 
     /**

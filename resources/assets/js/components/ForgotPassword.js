@@ -17,7 +17,7 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
         <form action="" id="login-form" onSubmit={handleSendEmail} method="post" className="panel panel-default text-center" style={{ boxShadow: 'none', width: '85%', margin: '15px auto' }}>
           <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
             <h3 style={{ marginTop: '10px' }}>
-              Forgot Password
+              Reset Password
             </h3>
           </div>
 
@@ -30,16 +30,18 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
               <div/>
             ) }
 
-            <div className="form-group">
+            <div className="form-group email-error">
               <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email"  className="form-control center-block" placeholder="Email" style={inputStyle}/>
             </div>
 
-            <button type="submit" className="btn btn-primary center-block forgot-password-btn" style={{ margin: '20px auto 10px' }} href="#!">
-              Send Email
+            <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
+
+            <button type="submit" className="btn btn-primary center-block forgot-password-btn form-btn" style={{ margin: '20px auto 10px' }} href="#!">
+              Send Link
             </button>
 
             <Link to="/" style={{ color: '#636b6f' }}>
-              Cancel
+              <button className="btn btn-default">Cancel</button>
             </Link>
           </div>
         </form>

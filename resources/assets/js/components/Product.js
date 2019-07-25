@@ -16,7 +16,6 @@ const Product = props => {
 
   const divStyle = {
     height: '100%',
-    marginLeft: '30px',
     marginTop: '30px',
     minHeight: '100vh'
   }
@@ -40,7 +39,7 @@ const Product = props => {
   if (!product && !newReviewForm && !editBtnClicked) {
     return(
       <div style={divStyle}>
-        <h2>No review selected.</h2>
+        <h2 className="mobile-center">No review selected.</h2>
         
         { token ? (
           <div/>
@@ -48,14 +47,14 @@ const Product = props => {
           <p>Log in to post a review</p>
         )}
 
-        <hr style={{ borderColor: '#e0e0e0', margin: '20px 0' }}/>
+        <hr style={{ borderColor: '#e0e0e0', margin: '20px 0 40px' }}/>
 
         <div className="panel panel-default text-center" style={{ margin: '15px', borderBottom: '0' }}>
           <div className="panel-heading" style={{ backgroundColor: '#f5f5f5', borderBottom: '0' }}>
             <h3>Latest Reviews</h3>
           </div>
           <div>
-            <ul className="list-group" style={{ marginBottom: '0' }}>
+            <ul className="list-group">
                 { renderNewProducts(5, renderThumbs) }
             </ul>
           </div>
@@ -86,15 +85,11 @@ const Product = props => {
 
       <hr className="text-center" style={{ width: '50%' }}/>
       
-      <div className="list-group-item text-center">
-        
-        <ul className="list-unstyled list-inline">
-          {(reviewStars(product.rating))}
-        </ul>
+      <div className="list-group-item text-center" style={{ paddingBottom: '25px' }}>
         <h4><b>Version:</b> {product.description}</h4>
 
         <h3>
-          <b>Recommended:</b> 
+          <b style={{ marginRight: '10px' }}>Recommended:</b> 
           {
             product.availability 
             ? <i className="fa fa-thumbs-up text-success" aria-hidden="true"></i>
@@ -118,12 +113,19 @@ const Product = props => {
           <div/>
         )}
 
-        <h3>Ratings:</h3>
-        <h4><b>Software:</b> {product.software} / 5</h4>
-        <h4><b>User Interface:</b> {product.user_interface} / 5</h4>
-        <h4><b>Speed/Size:</b> {product.speed_size} / 5</h4>
-        <h4><b>Security:</b> {product.administration} / 5</h4>
-        <h4><b>Support:</b> {product.support} / 5</h4>
+        <ul className="list-unstyled list-inline" style={{ display: 'inline-block', fontSize: '20px', marginTop: '0' }}>
+          {(reviewStars(product.rating))}
+        </ul>
+
+        <h3 style={{ marginTop: '5px' }}>Rating: {product.rating}/5</h3>
+
+        <hr style={{ width: '40%' }}/>
+
+        <h4><b>Software:</b> {product.software}/5</h4>
+        <h4><b>User Interface:</b> {product.user_interface}/5</h4>
+        <h4><b>Speed/Size:</b> {product.speed_size}/5</h4>
+        <h4><b>Security:</b> {product.administration}/5</h4>
+        <h4><b>Support:</b> {product.support}/5</h4>
         
         { product.posted_by === user.name ? (
           <div>
@@ -144,7 +146,7 @@ const Product = props => {
         <div>
           <hr/>
           <div className="panel panel-default text-center" style={{ margin: '15px' }}>
-            <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="panel-heading" style={{ backgroundColor: '#f5f5f5', borderBottom: '0' }}>
               <h3>Latest Reviews</h3>
             </div>
             <div>

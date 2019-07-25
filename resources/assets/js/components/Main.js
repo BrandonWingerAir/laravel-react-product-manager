@@ -40,6 +40,7 @@ export default class Main extends Component {
         this.handlePrevClick = this.handlePrevClick.bind(this);
         this.handleNextClick = this.handleNextClick.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.cancelClick = this.cancelClick.bind(this);
         this.renderNewProducts = this.renderNewProducts.bind(this);
         this.renderReviewForm = this.renderReviewForm.bind(this);
         this.handleAddProduct = this.handleAddProduct.bind(this);
@@ -184,7 +185,7 @@ export default class Main extends Component {
                         <span 
                             className="fa fa-star" 
                             aria-hidden="true" 
-                            style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
+                            style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top', marginLeft: '2px' }}
                         ></span>
                     </b>
                 </li>
@@ -232,7 +233,7 @@ export default class Main extends Component {
                 <ul className="list-group" style={{ marginBottom: '0' }}>
                     {renderProducts}
                 </ul>
-                { this.state.products.length > 15 ? (
+                { this.state.products.length > this.state.productsPerPage ? (
                     <nav style={{ textAlign: 'center' }}>
                         <ul className="pagination">
                             { currentPage === 1 ? (
@@ -345,9 +346,9 @@ export default class Main extends Component {
 
                     <h5><b>Version: </b>{product.description}</h5>
 
-                    <hr style={{ width: '40%' }}/>
+                    <hr style={{ width: '40%', margin: '25px auto 15px' }}/>
 
-                    <ul className="list-unstyled list-inline">
+                    <ul className="list-unstyled list-inline" style={{ margin: '0 auto 10px' }}>
                         {(reviewStars(Math.round(product.rating)))}
                     </ul>
                 </li>
@@ -357,13 +358,23 @@ export default class Main extends Component {
 
     // Product Functions
     renderReviewForm() {
-        this.setState({ newReviewForm: true });
+        this.setState({ editBtnClicked: false, newReviewForm: true });
+
+        $('html, body').animate({
+            scrollTop: $("#product").offset().top
+        }, 1000);
     }
 
     handleClick(product) {
-        this.state.editBtnClicked = false;
-        this.state.newReviewForm = false;
-        this.setState({ currentProduct: product });
+        this.setState({ editBtnClicked : false, newReviewForm: false, currentProduct: product });
+    }
+
+    cancelClick() {
+        this.setState({ editBtnClicked: false, newReviewForm: false });
+
+        $('html, body').animate({
+            scrollTop: $("#product").offset().top
+        }, 1000);
     }
 
     handleAddProduct(product) {
@@ -421,11 +432,12 @@ export default class Main extends Component {
                 newReviewForm: false,
                 currentProduct: data.data
             }));
+
+            $('html, body').animate({
+                scrollTop: $("#product").offset().top
+            }, 1000);
         })
-        .catch(errors => {        
-            
-            console.log(errors.response);
-            
+        .catch(errors => {            
             $("#add-new-btn")
                 .removeAttr("disabled")
                 .html("Submit");
@@ -435,11 +447,11 @@ export default class Main extends Component {
                     $('.title-error').addClass('has-error');
                     $('.version-error').addClass('has-error');
 
-                    $('#title-error-text').html(`
+                    $('.title-error-text').html(`
                         <li>${errors.response.data.errors.title[0]}</li>
                     `);
 
-                    $('#version-error-text').html(`
+                    $('.version-error-text').html(`
                         <li>${errors.response.data.errors.description[0]}</li>
                     `);
 
@@ -450,7 +462,7 @@ export default class Main extends Component {
                     $('.title-error').addClass('has-error');
                     $('.version-error').removeClass('has-error');
 
-                    $('#title-error-text').html(`
+                    $('.title-error-text').html(`
                         <li>${errors.response.data.errors.title[0]}</li>
                     `);
 
@@ -462,12 +474,12 @@ export default class Main extends Component {
                 $('.title-error').removeClass('has-error');
                 $('.version-error').addClass('has-error');
 
-                $('#version-error-text').html(`
+                $('.version-error-text').html(`
                     <li>${errors.response.data.errors.description[0]}</li>
                 `);
 
                 $('html, body').animate({
-                    scrollTop: $("#title-error-text").offset().top
+                    scrollTop: $(".title-error-text").offset().top
                 }, 1000);
             }
         });
@@ -496,6 +508,10 @@ export default class Main extends Component {
 
     handleEdit() {
         this.setState({ editBtnClicked: true });
+
+        $('html, body').animate({
+            scrollTop: $("#product").offset().top
+        }, 1000);
     }
 
     handleUpdate(product) {
@@ -515,14 +531,16 @@ export default class Main extends Component {
         product.rating = parseFloat(product.rating);
         product.availability = Number(product.availability);
         
-        var formData = new FormData();
-
-        formData.append("title", product.title);
-        
+        var formData = new FormData();        
         if (product.image) {
             formData.append("image", product.image, product.image.name);
         }
 
+        if (product.notes) {
+            formData.append("notes", product.notes);
+        }
+
+        formData.append("title", product.title);
         formData.append("description", product.description);
         formData.append("user_interface", product.user_interface);
         formData.append("speed_size", product.speed_size);
@@ -555,8 +573,51 @@ export default class Main extends Component {
                 )
             }));
         })
-        .catch(error => {
-            console.log(`${formData} ${error}`);
+        .catch(errors => {            
+            $("#add-new-btn")
+                .removeAttr("disabled")
+                .html("Submit");
+
+            if (typeof errors.response.data.errors.title !== 'undefined') {
+                if (typeof errors.response.data.errors.description !== 'undefined') {
+                    $('.title-error').addClass('has-error');
+                    $('.version-error').addClass('has-error');
+
+                    $('.title-error-text').html(`
+                        <li>${errors.response.data.errors.title[0]}</li>
+                    `);
+
+                    $('.version-error-text').html(`
+                        <li>${errors.response.data.errors.description[0]}</li>
+                    `);
+
+                    $('html, body').animate({
+                        scrollTop: $(".product-form").offset().top
+                    }, 1000);
+                } else {
+                    $('.title-error').addClass('has-error');
+                    $('.version-error').removeClass('has-error');
+
+                    $('.title-error-text').html(`
+                        <li>${errors.response.data.errors.title[0]}</li>
+                    `);
+
+                    $('html, body').animate({
+                        scrollTop: $(".product-form").offset().top
+                    }, 1000);
+                }
+            } else if (typeof errors.response.data.errors.description !== 'undefined') {
+                $('.title-error').removeClass('has-error');
+                $('.version-error').addClass('has-error');
+
+                $('.version-error-text').html(`
+                    <li>${errors.response.data.errors.description[0]}</li>
+                `);
+
+                $('html, body').animate({
+                    scrollTop: $(".title-error-text").offset().top
+                }, 1000);
+            }
         });
 
         this.setState({ editBtnClicked: false });
@@ -687,15 +748,20 @@ export default class Main extends Component {
 
             $("#login-form button")
                 .removeAttr("disabled")
-                .html("Login");
+                .html("Submit");
         })
-        .catch(error => {
-            alert('Error, check logs!');
-            console.log(error);
-
-            $("#login-form button")
+        .catch(errors => {
+            $(".form-btn")
                 .removeAttr("disabled")
-                .html("Login");
+                .html("Submit");
+
+            if (typeof errors.response.data.errors.email !== 'undefined') {
+                $('.email-error').addClass('has-error');
+
+                $('.form-errors').html(`
+                    <li>${errors.response.data.errors.email[0]}</li>
+                `);
+            }
         });
     }
 
@@ -773,12 +839,23 @@ export default class Main extends Component {
                 .removeAttr("disabled")
                 .html("Login");
         })
-        .catch(error => {
-            alert(error)
-
-            $("#login-form button")
+        .catch(errors => {
+            $(".form-btn")
                 .removeAttr("disabled")
-                .html("Login");
+                .html("Submit");
+
+            if (typeof errors.response.data.errors.password !== 'undefined') {
+                $('.password-error').addClass('has-error');
+
+                $('.form-errors').html(`
+                    <li>${errors.response.data.errors.password[0]}</li>
+                `);
+
+                if (errors.response.data.errors.password[0] === 'The password confirmation does not match.') {
+                    $('.password-error').removeClass('has-error');
+                    $('#password-confirm').addClass('has-error');
+                }
+            }
         });
     }
 
@@ -939,7 +1016,9 @@ export default class Main extends Component {
                     </h1>
                 </nav>
 
-                <div className="row margin-0">
+                <p id="session-expired"></p>
+
+                <div id="product" className="row margin-0">
                     <div className="col-xs-12 col-md-5 col-md-push-3">
                         <div className="row margin-0">
                             <div className="col-md-12">
@@ -959,13 +1038,14 @@ export default class Main extends Component {
                         <div className="row margin-0">
                             <div className="col-md-12">
                                 { this.state.token && this.state.newReviewForm ? (
-                                    <div style={{ height: '100vh' }}>
-                                        <AddProduct onAdd={this.handleAddProduct} />
+                                    <div style={{ minHeight: '100vh' }}>
+                                        <AddProduct 
+                                            onAdd={this.handleAddProduct} 
+                                            cancelClick={this.cancelClick}    
+                                        />
                                     </div>
                                 ) : (
-                                    <div>
-                                        
-                                    </div>
+                                    <div/>
                                 )}
                             </div>
                             <div className="col-md-12">
@@ -974,6 +1054,7 @@ export default class Main extends Component {
                                         <EditProduct
                                             product={this.state.currentProduct}
                                             update={this.handleUpdate}
+                                            cancelClick={this.cancelClick}
                                         />
                                     </div>
                                 ) : (
@@ -1029,7 +1110,7 @@ export default class Main extends Component {
 
                     <div className="reorder-xs">
                         <div className="col-xs-12 col-md-4 col-md-push-3">
-                            <div className="panel panel-default" style={{ margin: '15px', boxShadow: 'none' }}>
+                            <div className="panel panel-default" style={{ margin: '15px auto 25px', boxShadow: 'none', width: '95%' }}>
                                 <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
                                     <h2 className="text-center" style={{ marginTop: '10px' }}>About</h2>
                                 </div>

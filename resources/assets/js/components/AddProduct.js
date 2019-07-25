@@ -64,10 +64,6 @@ class AddProduct extends Component {
       marginLeft: '30px',
       marginRight: '30px'
     }
-    
-    const createPriceStyle = {
-      width: '30%'
-    }
 
     return(
       <div> 
@@ -80,7 +76,7 @@ class AddProduct extends Component {
               <input className="form-control" type="text" onChange={(e)=>this.handleInput('title', e)}/>
             </div>
 
-            <ul id="title-error-text" className="text-danger" style={{ listStyle: 'none' }}></ul>
+            <ul className="text-danger title-error-text" style={{ listStyle: 'none' }}></ul>
 
             <div className="form-group">
               <label><h4>Image <span style={{ fontWeight: '400' }}>(Optional):</span></h4></label>
@@ -92,7 +88,7 @@ class AddProduct extends Component {
               <input className="form-control" type="text" onChange={(e)=>this.handleInput('description', e)}/>
             </div>
 
-            <ul id="version-error-text" className="text-danger" style={{ listStyle: 'none' }}></ul>
+            <ul className="text-danger version-error-text" style={{ listStyle: 'none' }}></ul>
             
             <div className="form-group">
               <label><h4>Notes <span style={{ fontWeight: '400' }}>(Optional)</span>:</h4></label>
@@ -102,7 +98,7 @@ class AddProduct extends Component {
             <h4>Ratings:</h4>
             <hr style={{ width: '40%', marginLeft: '0' }}/>
             <label><h5>User Interface:</h5></label>
-            <select className="form-control" style={createPriceStyle} type="number" value="3" onChange={(e)=>this.handleRating('user_interface', e)}>
+            <select className="form-control form-option" defaultValue="3" type="number" onChange={(e)=>this.handleRating('user_interface', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
               <option value="3">3 (Good)</option>
@@ -111,7 +107,7 @@ class AddProduct extends Component {
             </select>
 
             <label><h5>Speed/Size:</h5></label>
-            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
+            <select className="form-control form-option" defaultValue="3" type="number" onChange={(e)=>this.handleRating('speed_size', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
               <option value="3">3 (Good)</option>
@@ -120,7 +116,7 @@ class AddProduct extends Component {
             </select>
 
             <label><h5>Software:</h5></label>
-            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('software', e)}>
+            <select className="form-control form-option" defaultValue="3" type="number" onChange={(e)=>this.handleRating('software', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
               <option value="3">3 (Good)</option>
@@ -129,7 +125,7 @@ class AddProduct extends Component {
             </select>
 
             <label><h5>Security:</h5></label>
-            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('administration', e)}>
+            <select className="form-control form-option" defaultValue="3" type="number" onChange={(e)=>this.handleRating('administration', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
               <option value="3">3 (Good)</option>
@@ -138,7 +134,7 @@ class AddProduct extends Component {
             </select>
 
             <label><h5>Support:</h5></label>
-            <select className="form-control" style={createPriceStyle} value="3" type="number" onChange={(e)=>this.handleRating('support', e)}>
+            <select className="form-control form-option" defaultValue="3" type="number" onChange={(e)=>this.handleRating('support', e)}>
               <option value="1">1 (Poor)</option>
               <option value="2">2 (Okay)</option>
               <option value="3">3 (Good)</option>
@@ -148,16 +144,19 @@ class AddProduct extends Component {
 
             <hr style={{ width: '40%', margin: '30px 0 10px' }}/>
 
-            <div className="form-group" style={createPriceStyle}>
-              <label><h5>Would you recommend?</h5></label>
+            <div className="form-group form-option">
+              <label><h4>Would you recommend?</h4></label>
               <select className="form-control" type="number" onChange={(e)=>this.handleInput('availability', e)}>
                 <option value="1">Yes</option>
                 <option value="0">No</option>
               </select>
             </div>
 
-            <button id="add-new-btn" className="btn btn-primary" type="submit" >
+            <button id="add-new-btn" className="btn btn-primary" type="submit" style={{ marginRight: '20px' }}>
               Submit
+            </button>
+            <button className="btn btn-default" onClick={this.props.cancelClick}>
+              Cancel
             </button>
           </form>
         </div>

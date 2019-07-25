@@ -91,18 +91,18 @@ class Home extends React.Component {
   
         return (
           <li 
-            className="list-group-item"
-            style={{ width: '90%', margin: '0 auto' }}
+            className="list-group-item user-review-list"
+            style={{ width: '90%', margin: '0 auto', borderBottom: '0' }}
             onClick={() =>this.props.handleClick(product)} 
             key={newKey}
           >
             <h4 style={{ display: 'inline-block', marginRight: '5px' }}>{product.title}</h4>
-            <b>
+            <b style={{ fontSize: '16px' }}>
                 {Math.round(product.rating)}
                 <span 
                     className="fa fa-star" 
                     aria-hidden="true" 
-                    style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top' }}
+                    style={{ color: '#3097D1', fontSize: '10px', verticalAlign: 'text-top', marginLeft: '2px' }}
                 ></span>
             </b>
           </li>
@@ -114,9 +114,9 @@ class Home extends React.Component {
           <ul>
             {renderCurrentPage}
           </ul>
-          { usersProducts.length > 3 ? (
+          { usersProducts.length > productsPerPage ? (
               <nav style={{ textAlign: 'center' }}>
-                  <ul className="pagination">
+                  <ul className="pagination" style={{ marginBottom: '0' }}>
                       { currentPage === 1 ? (
                           <li className="disabled">
                               <span>
@@ -194,23 +194,27 @@ class Home extends React.Component {
       } else alert("Login Failed!");
     })
     .catch(error => {
-      alert(`Session has expired, please log in.`);
+      $('#session-expired').textContent = 'Session has expired, please log in.';
     });
   }
 
   render() {
     return (
       <div style={styles}>
-        <h2>Dashboard &#127968;</h2>
-        <hr style={{ width: '50%' }}/>
-        <div className="panel panel-default" style={{ width: '80%', margin: '0 auto 15px' }}>
+        <div className="panel panel-default" style={{ width: '80%', margin: '12px auto 20px' }}>
+          <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
+            <h3 style={{ marginTop: '10px' }}>
+              Dashboard
+            </h3>
+          </div>
           <div className="panel-body">
             <div className="list-group-item" style={{ width: '40%', borderRadius: '4px', margin: '0 auto', padding: '0' }}>
               <h3 style={{ marginTop: '10px' }}>{this.state.user.name}</h3>
             </div>
-            <hr style={{ width: '80%' }}/>
-            <h4>My Reviews:</h4>
+            <hr style={{ width: '70%',  }}/>
+            <h4 style={{ marginBottom: '20px' }}>My Reviews:</h4>
             {this.renderUserReviews()}
+            <hr style={{ width: '70%'  }}/>
             <button
                 className="btn btn-success"
                 onClick={this.props.renderReviewForm}
@@ -223,7 +227,7 @@ class Home extends React.Component {
               onClick={this.props.logoutUser}
               style={{ margin: '0 10px' }}
             >
-              Logout{" "}
+              Logout
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@
   
   use App\Http\Controllers\Controller;
   use Illuminate\Http\Request;
+  use Illuminate\Support\Facades\Validator;
   use Carbon\Carbon;
   use App\Notifications\PasswordResetRequest;
   use App\Notifications\PasswordResetSuccess;
@@ -43,9 +44,13 @@
        */
       public function create(Request $request)
       {
-        $request->validate([
-            'email' => 'required|string|email',
-        ]);        
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|exists:users',
+        ]);
+
+        if ($validator->fails()) {
+          return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
+        }
         
         $user = User::where('email', $request->email)->first(); 
 
@@ -114,11 +119,15 @@
       */
       public function reset(Request $request)
       {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
-            'password' => 'required|string|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'token' => 'required|string'
-        ]);        
+        ]);
+        
+        if ($validator->fails()) {
+          return response()->json(['errors' => $validator->errors(), 'error' => 'Form data invalid!'], 422);
+        }
         
         $passwordReset = PasswordReset::where([
             ['token', $request->token],
