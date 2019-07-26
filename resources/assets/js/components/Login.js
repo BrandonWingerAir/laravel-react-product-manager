@@ -23,24 +23,24 @@ const Login = ({ history, loginUser = f => f }) => {
 
           <div className="panel-body">
             <div className="form-group email-error">
-              <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email"  className="form-control center-block" placeholder="Email" style={inputStyle}/>
+              <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email"  className="form-control center-block user-form-input" placeholder="Email" style={inputStyle}/>
             </div>
             
             <div className="form-group password-error">
-              <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" placeholder="Password" style={inputStyle}/>
+              <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block user-form-input" placeholder="Password" style={inputStyle}/>
             </div>
 
             <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
 
-            <button type="submit" className="btn btn-primary center-block email-login-btn" style={{ margin: '20px auto 10px' }} href="#!">
+            <button type="submit" className="btn btn-primary center-block email-login-btn mobile-btn" style={{ margin: '20px auto 15px' }} href="#!">
               Login
             </button>
 
-            <Link to="/register" className="btn btn-info">
-              Register
+            <Link to="/register" className="btn btn-success mobile-btn" style={{ marginBottom: '15px' }}>
+              Sign Up
             </Link>
 
-            <Link to="/forgot-password" className="center-block" style={{ color: '#636b6f' }}>
+            <Link to="/forgot-password" className="center-block" style={{ color: '#636b6f', marginBottom: '10px' }}>
               Forgot your password?
             </Link>
           </div>

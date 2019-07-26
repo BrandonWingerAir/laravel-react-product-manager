@@ -44,7 +44,7 @@ const Product = props => {
         { token ? (
           <div/>
         ) : (
-          <p>Log in to post a review</p>
+          <p className="mobile-center">Log in to post a review</p>
         )}
 
         <hr style={{ borderColor: '#e0e0e0', margin: '20px 0 40px' }}/>
@@ -76,7 +76,7 @@ const Product = props => {
       </div>
 
       { product.image ? (
-        <img src={"http://localhost:8000/" + product.image} alt="" className="img-responsive img-thumbnail center-block" style={{ width: '80%', height: '370px', marginTop: '30px' }}/>
+        <img src={"/" + product.image} alt="" className="img-responsive img-thumbnail center-block" style={{ width: '80%', height: '370px', marginTop: '30px' }}/>
       ) : (
         <div/>
       )}

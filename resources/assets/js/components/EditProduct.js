@@ -63,10 +63,7 @@ class EditProduct extends Component {
       margin: '30px',
       flexDirection: 'space-between',
       marginLeft: '30px',
-    }
-
-    const editPriceStyle = {
-      width: '30%'
+      marginBottom: '40px'
     }
 
     return (
@@ -138,7 +135,7 @@ class EditProduct extends Component {
             <hr style={{ width: '40%', marginLeft: '0' }}/>
 
             <label><h5>User Interface</h5></label>
-            <select className="form-control" style={editPriceStyle} defaultValue={product.user_interface} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
+            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.user_interface} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -147,7 +144,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Speed/Size</h5></label>
-            <select className="form-control" style={editPriceStyle} defaultValue={product.speed_size} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
+            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.speed_size} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -156,7 +153,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Software</h5></label>
-            <select className="form-control" style={editPriceStyle} defaultValue={product.software} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
+            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.software} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -165,7 +162,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Administration</h5></label>
-            <select className="form-control" style={editPriceStyle} defaultValue={product.administration} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
+            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.administration} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -174,7 +171,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Support</h5></label>
-            <select className="form-control" style={editPriceStyle} defaultValue={product.support} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
+            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.support} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -194,20 +191,20 @@ class EditProduct extends Component {
 
             { !this.state.product.title || !this.state.product.description ? (
               <div>
-                <button className="btn btn-primary disabled" type="submit" style={{ marginRight: '20px' }}>
+                <button className="btn btn-primary mobile-btn disabled" style={{ marginRight: '20px', marginTop: '15px' }}>
                   Submit
                 </button>
-                <button className="btn btn-default" type="submit">
+                <button className="btn btn-default mobile-btn" style={{ marginTop: '15px' }} onClick={this.props.cancelClick}>
                   Cancel
                 </button>
                 <p className="text-danger">A required field is empty.</p>
               </div>
               ) : (
                 <div>
-                  <button className="btn btn-primary" type="submit" style={{ marginRight: '20px' }}>
+                  <button className="btn btn-primary mobile-btn" type="submit" style={{ marginRight: '20px', marginTop: '15px' }}>
                     Submit
                   </button>
-                  <button className="btn btn-default" onClick={this.props.cancelClick}>
+                  <button className="btn btn-default mobile-btn" style={{ marginTop: '15px' }} onClick={this.props.cancelClick}>
                     Cancel
                   </button>
                 </div>

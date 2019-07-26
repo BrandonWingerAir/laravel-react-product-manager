@@ -216,14 +216,14 @@ class Home extends React.Component {
             {this.renderUserReviews()}
             <hr style={{ width: '70%'  }}/>
             <button
-                className="btn btn-success"
+                className="btn btn-success mobile-btn"
                 onClick={this.props.renderReviewForm}
                 style={{ margin: '0 10px' }}
             >
               Add New
             </button>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary mobile-btn"
               onClick={this.props.logoutUser}
               style={{ margin: '0 10px' }}
             >

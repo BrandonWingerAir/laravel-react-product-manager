@@ -62,7 +62,8 @@ class AddProduct extends Component {
   render() {
     const divStyle = {
       marginLeft: '30px',
-      marginRight: '30px'
+      marginRight: '30px',
+      marginBottom: '40px'
     }
 
     return(
@@ -142,7 +143,7 @@ class AddProduct extends Component {
               <option value="5">5 (Perfect)</option>
             </select>
 
-            <hr style={{ width: '40%', margin: '30px 0 10px' }}/>
+            <hr className="mobile-hr" style={{ width: '40%', margin: '30px 0 10px' }}/>
 
             <div className="form-group form-option">
               <label><h4>Would you recommend?</h4></label>
@@ -152,10 +153,10 @@ class AddProduct extends Component {
               </select>
             </div>
 
-            <button id="add-new-btn" className="btn btn-primary" type="submit" style={{ marginRight: '20px' }}>
+            <button id="add-new-btn" className="btn btn-primary mobile-btn" type="submit" style={{ marginRight: '20px', marginTop: '15px' }}>
               Submit
             </button>
-            <button className="btn btn-default" onClick={this.props.cancelClick}>
+            <button className="btn btn-default mobile-btn" style={{ marginTop: '15px' }} onClick={this.props.cancelClick}>
               Cancel
             </button>
           </form>

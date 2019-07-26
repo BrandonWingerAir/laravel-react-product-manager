@@ -23758,7 +23758,7 @@ var Product = function Product(props) {
       ),
       token ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'p',
-        null,
+        { className: 'mobile-center' },
         'Log in to post a review'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { borderColor: '#e0e0e0', margin: '20px 0 40px' } }),
@@ -23801,7 +23801,7 @@ var Product = function Product(props) {
         product.title
       )
     ),
-    product.image ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: "http://localhost:8000/" + product.image, alt: '', className: 'img-responsive img-thumbnail center-block', style: { width: '80%', height: '370px', marginTop: '30px' } }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null),
+    product.image ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: "/" + product.image, alt: '', className: 'img-responsive img-thumbnail center-block', style: { width: '80%', height: '370px', marginTop: '30px' } }) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'h4',
       { className: 'text-center' },
@@ -45110,6 +45110,9 @@ var Main = function (_Component) {
         key: 'handleClick',
         value: function handleClick(product) {
             this.setState({ editBtnClicked: false, newReviewForm: false, currentProduct: product });
+            __WEBPACK_IMPORTED_MODULE_12_jquery___default()('html, body').animate({
+                scrollTop: __WEBPACK_IMPORTED_MODULE_12_jquery___default()("#product").offset().top
+            }, 1000);
         }
     }, {
         key: 'cancelClick',
@@ -45820,7 +45823,11 @@ var Main = function (_Component) {
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                         'h2',
                                         { style: { margin: '10px 0 0' } },
-                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-github', 'aria-hidden': 'true' })
+                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                            'a',
+                                            { href: 'https://github.com/BrandonWingerAir/laravel-react-product-manager', target: '_blank' },
+                                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-github', style: { color: '#636b6f' }, 'aria-hidden': 'true' })
+                                        )
                                     )
                                 ),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -45829,7 +45836,12 @@ var Main = function (_Component) {
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                         'h5',
                                         { className: 'text-center' },
-                                        'Brandon Winger-Air \xA9 2019'
+                                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                            'a',
+                                            { href: 'http://brandonwinger.com', id: 'copyright-link', target: '_blank' },
+                                            'Brandon Winger-Air'
+                                        ),
+                                        ' \xA9 2019'
                                     )
                                 )
                             ),
@@ -45841,7 +45853,14 @@ var Main = function (_Component) {
                                     { style: { marginBottom: '15px' } },
                                     'Contribute to future development:'
                                 ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png', alt: '', width: '25%' })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'form',
+                                    { action: 'https://www.paypal.com/cgi-bin/webscr', method: 'post', target: '_top' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'hidden', name: 'cmd', value: '_s-xclick' }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'hidden', name: 'hosted_button_id', value: '7RVPA4ZSW9N9J' }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'image', src: 'https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif', border: '0', name: 'submit', title: 'PayPal - The safer, easier way to pay online!', alt: 'Donate with PayPal button' }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { alt: '', border: '0', src: 'https://www.paypal.com/en_CA/i/scr/pixel.gif', width: '1', height: '1' })
+                                )
                             ),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -45852,7 +45871,11 @@ var Main = function (_Component) {
                                     null,
                                     'Need a fast, free operating system?'
                                 ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png', width: '80%', style: { border: '1px solid #bdbdbd', borderRadius: '3px', margin: '30px 0' } })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    'a',
+                                    { href: 'https://lubuntu.net/', target: '_blank' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { src: 'https://res.cloudinary.com/dy8vgsd4o/image/upload/v1564054093/ubuntu_download_guxfwk.png', width: '80%', style: { border: '1px solid #bdbdbd', borderRadius: '3px', margin: '30px 0' } })
+                                )
                             )
                         ),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59260,7 +59283,8 @@ var AddProduct = function (_Component) {
 
       var divStyle = {
         marginLeft: '30px',
-        marginRight: '30px'
+        marginRight: '30px',
+        marginBottom: '40px'
       };
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59561,7 +59585,7 @@ var AddProduct = function (_Component) {
                 '5 (Perfect)'
               )
             ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { width: '40%', margin: '30px 0 10px' } }),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { className: 'mobile-hr', style: { width: '40%', margin: '30px 0 10px' } }),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'div',
               { className: 'form-group form-option' },
@@ -59593,12 +59617,12 @@ var AddProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'button',
-              { id: 'add-new-btn', className: 'btn btn-primary', type: 'submit', style: { marginRight: '20px' } },
+              { id: 'add-new-btn', className: 'btn btn-primary mobile-btn', type: 'submit', style: { marginRight: '20px', marginTop: '15px' } },
               'Submit'
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'button',
-              { className: 'btn btn-default', onClick: this.props.cancelClick },
+              { className: 'btn btn-default mobile-btn', style: { marginTop: '15px' }, onClick: this.props.cancelClick },
               'Cancel'
             )
           )
@@ -59698,11 +59722,8 @@ var EditProduct = function (_Component) {
         position: 'inline-block',
         margin: '30px',
         flexDirection: 'space-between',
-        marginLeft: '30px'
-      };
-
-      var editPriceStyle = {
-        width: '30%'
+        marginLeft: '30px',
+        marginBottom: '40px'
       };
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59837,7 +59858,7 @@ var EditProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "select",
-              { className: "form-control", style: editPriceStyle, defaultValue: product.user_interface, type: "number", name: "user_interface", onChange: function onChange(e) {
+              { className: "form-control form-option", style: editPriceStyle, defaultValue: product.user_interface, type: "number", name: "user_interface", onChange: function onChange(e) {
                   return _this2.handleRating('user_interface', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59877,7 +59898,7 @@ var EditProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "select",
-              { className: "form-control", style: editPriceStyle, defaultValue: product.speed_size, type: "number", name: "speed_size", onChange: function onChange(e) {
+              { className: "form-control form-option", style: editPriceStyle, defaultValue: product.speed_size, type: "number", name: "speed_size", onChange: function onChange(e) {
                   return _this2.handleRating('speed_size', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59917,7 +59938,7 @@ var EditProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "select",
-              { className: "form-control", style: editPriceStyle, defaultValue: product.software, type: "number", name: "software", onChange: function onChange(e) {
+              { className: "form-control form-option", style: editPriceStyle, defaultValue: product.software, type: "number", name: "software", onChange: function onChange(e) {
                   return _this2.handleRating('software', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59957,7 +59978,7 @@ var EditProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "select",
-              { className: "form-control", style: editPriceStyle, defaultValue: product.administration, type: "number", name: "administration", onChange: function onChange(e) {
+              { className: "form-control form-option", style: editPriceStyle, defaultValue: product.administration, type: "number", name: "administration", onChange: function onChange(e) {
                   return _this2.handleRating('administration', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -59997,7 +60018,7 @@ var EditProduct = function (_Component) {
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "select",
-              { className: "form-control", style: editPriceStyle, defaultValue: product.support, type: "number", name: "support", onChange: function onChange(e) {
+              { className: "form-control form-option", style: editPriceStyle, defaultValue: product.support, type: "number", name: "support", onChange: function onChange(e) {
                   return _this2.handleRating('support', e);
                 } },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -60061,12 +60082,12 @@ var EditProduct = function (_Component) {
               null,
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "button",
-                { className: "btn btn-primary disabled", type: "submit", style: { marginRight: '20px' } },
+                { className: "btn btn-primary mobile-btn disabled", style: { marginRight: '20px', marginTop: '15px' } },
                 "Submit"
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "button",
-                { className: "btn btn-default", type: "submit" },
+                { className: "btn btn-default mobile-btn", style: { marginTop: '15px' }, onClick: this.props.cancelClick },
                 "Cancel"
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -60079,12 +60100,12 @@ var EditProduct = function (_Component) {
               null,
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "button",
-                { className: "btn btn-primary", type: "submit", style: { marginRight: '20px' } },
+                { className: "btn btn-primary mobile-btn", type: "submit", style: { marginRight: '20px', marginTop: '15px' } },
                 "Submit"
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "button",
-                { className: "btn btn-default", onClick: this.props.cancelClick },
+                { className: "btn btn-default mobile-btn", style: { marginTop: '15px' }, onClick: this.props.cancelClick },
                 "Cancel"
               )
             )
@@ -60143,7 +60164,7 @@ var Register = function Register(_ref) {
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "h3",
             { style: { marginTop: '10px' } },
-            "Register"
+            "Sign Up"
           )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -60154,31 +60175,31 @@ var Register = function Register(_ref) {
             { id: "name-error", className: "form-group" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
                 return _name = input;
-              }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block", style: inputStyle, placeholder: "Name" })
+              }, autoComplete: "off", id: "name-input", name: "name", type: "text", className: "form-control center-block user-form-input", style: inputStyle, placeholder: "Name" })
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "form-group email-error" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
                 return _email = input;
-              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", style: inputStyle, placeholder: "Email" })
+              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block user-form-input", style: inputStyle, placeholder: "Email" })
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "form-group password-error" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
                 return _password = input;
-              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", style: inputStyle, placeholder: "Password" })
+              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block user-form-input", style: inputStyle, placeholder: "Password" })
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("ul", { className: "form-errors text-danger center-block", style: { listStyle: 'none' } }),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "button",
-            { type: "submit", className: "btn btn-primary center-block text-center email-login-btn", style: { marginBottom: '10px' }, href: "#!" },
+            { type: "submit", className: "btn btn-primary center-block text-center email-login-btn mobile-btn", style: { marginBottom: '15px' }, href: "#!" },
             "Register"
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-            { to: "/login", className: "btn btn-info" },
+            { to: "/login", className: "btn btn-success mobile-btn" },
             "Login"
           )
         )
@@ -60243,29 +60264,29 @@ var Login = function Login(_ref) {
             { className: "form-group email-error" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
                 return _email = input;
-              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block", placeholder: "Email", style: inputStyle })
+              }, autoComplete: "off", id: "email-input", name: "email", type: "email", className: "form-control center-block user-form-input", placeholder: "Email", style: inputStyle })
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "form-group password-error" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { ref: function ref(input) {
                 return _password = input;
-              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block", placeholder: "Password", style: inputStyle })
+              }, autoComplete: "off", id: "password-input", name: "password", type: "password", className: "form-control center-block user-form-input", placeholder: "Password", style: inputStyle })
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("ul", { className: "form-errors text-danger center-block", style: { listStyle: 'none' } }),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "button",
-            { type: "submit", className: "btn btn-primary center-block email-login-btn", style: { margin: '20px auto 10px' }, href: "#!" },
+            { type: "submit", className: "btn btn-primary center-block email-login-btn mobile-btn", style: { margin: '20px auto 15px' }, href: "#!" },
             "Login"
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-            { to: "/register", className: "btn btn-info" },
-            "Register"
+            { to: "/register", className: "btn btn-success mobile-btn", style: { marginBottom: '15px' } },
+            "Sign Up"
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             __WEBPACK_IMPORTED_MODULE_1_react_router_dom__["b" /* Link */],
-            { to: "/forgot-password", className: "center-block", style: { color: '#636b6f' } },
+            { to: "/forgot-password", className: "center-block", style: { color: '#636b6f', marginBottom: '10px' } },
             "Forgot your password?"
           )
         )
@@ -60762,7 +60783,7 @@ var Home = function (_React$Component) {
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "button",
               {
-                className: "btn btn-success",
+                className: "btn btn-success mobile-btn",
                 onClick: this.props.renderReviewForm,
                 style: { margin: '0 10px' }
               },
@@ -60771,7 +60792,7 @@ var Home = function (_React$Component) {
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               "button",
               {
-                className: "btn btn-primary",
+                className: "btn btn-primary mobile-btn",
                 onClick: this.props.logoutUser,
                 style: { margin: '0 10px' }
               },

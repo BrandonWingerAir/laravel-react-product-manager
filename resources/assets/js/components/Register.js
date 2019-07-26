@@ -17,30 +17,30 @@ const Register = ({ history, registerUser = f => f }) => {
         <form action="" id="login-form" onSubmit={handleLogin} method="post" className="panel panel-default text-center" style={{ boxShadow: 'none', width: '85%', margin: '15px auto' }}>
           <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
             <h3 style={{ marginTop: '10px' }}>
-              Register
+              Sign Up
             </h3>
           </div>
 
           <div className="panel-body">
             <div id="name-error" className="form-group">
-              <input ref={input => (_name = input)} autoComplete="off" id="name-input" name="name" type="text" className="form-control center-block" style={inputStyle} placeholder="Name"/>
+              <input ref={input => (_name = input)} autoComplete="off" id="name-input" name="name" type="text" className="form-control center-block user-form-input" style={inputStyle} placeholder="Name"/>
             </div>
 
             <div className="form-group email-error">
-              <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email" className="form-control center-block" style={inputStyle} placeholder="Email"/>
+              <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email" className="form-control center-block user-form-input" style={inputStyle} placeholder="Email"/>
             </div>
 
             <div className="form-group password-error">
-              <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block" style={inputStyle} placeholder="Password"/>
+              <input ref={input => (_password = input)} autoComplete="off" id="password-input" name="password" type="password" className="form-control center-block user-form-input" style={inputStyle} placeholder="Password"/>
             </div>
 
             <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
 
-            <button type="submit" className="btn btn-primary center-block text-center email-login-btn"style={{ marginBottom: '10px' }} href="#!">
+            <button type="submit" className="btn btn-primary center-block text-center email-login-btn mobile-btn" style={{ marginBottom: '15px' }} href="#!">
               Register
             </button>
 
-            <Link to="/login" className="btn btn-info">
+            <Link to="/login" className="btn btn-success mobile-btn">
               Login
             </Link>
           </div>

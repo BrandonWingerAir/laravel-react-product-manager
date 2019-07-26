@@ -367,6 +367,9 @@ export default class Main extends Component {
 
     handleClick(product) {
         this.setState({ editBtnClicked : false, newReviewForm: false, currentProduct: product });
+        $('html, body').animate({
+            scrollTop: $("#product").offset().top
+        }, 1000);
     }
 
     cancelClick() {
@@ -1119,24 +1122,37 @@ export default class Main extends Component {
                                         View and post ratings on computer Operating Systems with an overall star rating calculated out of 5 categories: UI, speed/size, software, support and system administration.
                                     </p>
                                     <h2 style={{ margin: '10px 0 0' }}>
-                                        <i className="fa fa-github" aria-hidden="true"></i>
+                                        <a href="https://github.com/BrandonWingerAir/laravel-react-product-manager" target="_blank">
+                                            <i className="fa fa-github" style={{ color: '#636b6f' }} aria-hidden="true"></i>
+                                        </a>
                                     </h2>
                                 </div>
                                 <div className="panel-footer text-center">
-                                    <h5 className="text-center">Brandon Winger-Air &copy; 2019</h5>
+                                    <h5 className="text-center">
+                                        <a href="http://brandonwinger.com" id="copyright-link" target="_blank">
+                                            Brandon Winger-Air
+                                        </a> &copy; 2019
+                                    </h5>
                                 </div>
                             </div>
 
                             <div className="text-center">
                                 <h4 style={{ marginBottom: '15px' }}>Contribute to future development:</h4>
-                                <img src="https://www.mountainfamilycenter.org/wp-content/uploads/2018/06/5895ceb8cba9841eabab6072.png" alt="" width="25%"/>
+                                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                                    <input type="hidden" name="cmd" value="_s-xclick" />
+                                    <input type="hidden" name="hosted_button_id" value="7RVPA4ZSW9N9J" />
+                                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                                    <img alt="" border="0" src="https://www.paypal.com/en_CA/i/scr/pixel.gif" width="1" height="1" />
+                                </form>
                             </div>
                             
                             <hr/>
 
                             <div className="text-center">
                                 <h4>Need a fast, free operating system?</h4>
-                                <img src="https://res.cloudinary.com/dy8vgsd4o/image/upload/v1563301710/ubuntu_download_nae0sy.png" width="80%" style={{ border: '1px solid #bdbdbd', borderRadius: '3px', margin: '30px 0' }}/>
+                                <a href="https://lubuntu.net/" target="_blank">
+                                    <img src="https://res.cloudinary.com/dy8vgsd4o/image/upload/v1564054093/ubuntu_download_guxfwk.png" width="80%" style={{ border: '1px solid #bdbdbd', borderRadius: '3px', margin: '30px 0' }}/>
+                                </a>
                             </div>
                         </div>
 
