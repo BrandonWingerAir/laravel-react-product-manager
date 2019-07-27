@@ -639,7 +639,7 @@ export default class Main extends Component {
         formData.append("password", password);
         formData.append("token_expire", this.setTokenExpire());        
 
-        axios.post("api/user/login/", formData)
+        axios.post("api/user/login", formData)
         .then(response => {
             return response;
         })

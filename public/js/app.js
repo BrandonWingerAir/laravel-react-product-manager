@@ -45371,7 +45371,7 @@ var Main = function (_Component) {
             formData.append("password", password);
             formData.append("token_expire", this.setTokenExpire());
 
-            __WEBPACK_IMPORTED_MODULE_11_axios___default.a.post("api/user/login/", formData).then(function (response) {
+            __WEBPACK_IMPORTED_MODULE_11_axios___default.a.post("api/user/login", formData).then(function (response) {
                 return response;
             }).then(function (json) {
                 if (json.data.success) {
