@@ -8414,6 +8414,10 @@ input[type="submit"] {
   .user-form-input {
     width: 100% !important;
   }
+
+  .mobile-center {
+    text-align: center;
+  }
 }
 
 @media screen and (min-width: 768px) {

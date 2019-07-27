@@ -10,13 +10,13 @@ class AddProduct extends Component {
             title: '',
             description: '',
             notes: '',
-            user_interface: 5,
-            speed_size: 5,
-            software: 5,
-            support: 5,
-            administration: 5,
-            rating: 5,
-            availability: 1
+            user_interface: 3,
+            speed_size: 3,
+            software: 3,
+            support: 3,
+            administration: 3,
+            rating: 3,
+            availability: 3
         }
       }
     
