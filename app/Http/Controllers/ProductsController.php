@@ -73,8 +73,7 @@ class ProductsController extends Controller
         $product = Product::findOrFail($id);
 
         if($request->hasFile('image')) {
-            // str_replace on WINDOWS ONLY (Change for other OS)
-            $productImg = str_replace('\\', '/', public_path($product->image));
+            $productImg = public_path($product->image);
 
             if (is_file($productImg)) {
                 unlink($productImg);
