@@ -44,7 +44,7 @@ class ProductsTableSeeder extends Seeder
 
             $device_version = $faker->unique()->numberBetween($min = 1, $max = 20) . '.'
                 . $faker->unique()->numerify('##'). '.'
-                . $faker->unique()->numerify($min = 0, $max = 9999);
+                . $faker->unique()->numberBetween($min = 0, $max = 9999);
 
             Product::create([
                 'title' => $faker->unique()->devicePlatform,
