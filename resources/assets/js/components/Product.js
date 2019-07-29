@@ -10,6 +10,7 @@ const Product = props => {
     update,
     deleteProduct,
     handleDeleteConfirm,
+    deleteConfirmModal,
     token,
     user
   } = props;
@@ -55,7 +56,7 @@ const Product = props => {
           </div>
           <div>
             <ul className="list-group">
-                { renderNewProducts(5, renderThumbs) }
+              { renderNewProducts(5, renderThumbs) }
             </ul>
           </div>
         </div>
@@ -161,4 +162,4 @@ const Product = props => {
   )
 }
 
-export default Product ;
+export default Product;

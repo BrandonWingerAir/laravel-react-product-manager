@@ -87,7 +87,7 @@ class Home extends React.Component {
       });
       
       const renderCurrentPage = currentProducts.map((product) => {
-        var newKey = `${product.title} (User)`;
+        var newKey = `${product.id} (User)`;
   
         return (
           <li 
@@ -201,7 +201,7 @@ class Home extends React.Component {
   render() {
     return (
       <div style={styles}>
-        <div className="panel panel-default" style={{ width: '80%', margin: '12px auto 20px' }}>
+        <div className="panel panel-default" style={{ width: '85%', margin: '12px auto 20px' }}>
           <div className="panel-heading" style={{ backgroundColor: '#f5f5f5' }}>
             <h3 style={{ marginTop: '10px' }}>
               Dashboard

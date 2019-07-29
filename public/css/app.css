@@ -8363,6 +8363,11 @@ input[type="submit"] {
   margin: 10px 0 20px;
 }
 
+.modal {
+  display: block;
+  top: 30vh;
+}
+
 #no-user-reviews:hover {
   background: #fff;
   cursor: initial;

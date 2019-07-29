@@ -135,7 +135,7 @@ class EditProduct extends Component {
             <hr style={{ width: '40%', marginLeft: '0' }}/>
 
             <label><h5>User Interface</h5></label>
-            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.user_interface} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
+            <select className="form-control form-option" defaultValue={product.user_interface} type="number" name="user_interface" onChange={(e)=>this.handleRating('user_interface', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -144,7 +144,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Speed/Size</h5></label>
-            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.speed_size} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
+            <select className="form-control form-option" defaultValue={product.speed_size} type="number" name="speed_size" onChange={(e)=>this.handleRating('speed_size', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -153,7 +153,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Software</h5></label>
-            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.software} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
+            <select className="form-control form-option" defaultValue={product.software} type="number" name="software" onChange={(e)=>this.handleRating('software', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -162,7 +162,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Administration</h5></label>
-            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.administration} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
+            <select className="form-control form-option" defaultValue={product.administration} type="number" name="administration" onChange={(e)=>this.handleRating('administration', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -171,7 +171,7 @@ class EditProduct extends Component {
             </select>
 
             <label><h5>Support</h5></label>
-            <select className="form-control form-option" style={editPriceStyle} defaultValue={product.support} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
+            <select className="form-control form-option" defaultValue={product.support} type="number" name="support" onChange={(e)=>this.handleRating('support', e)}>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -181,7 +181,7 @@ class EditProduct extends Component {
 
             <hr style={{ width: '40%', margin: '30px 0 10px' }}/>
 
-            <div className="form-group" style={editPriceStyle}>
+            <div className="form-group form-option">
               <label><h5>Would you recommend?</h5></label>
               <select className="form-control" value={product.availability} name="availability" onChange={(e)=>this.handleInput('availability', e)}>
                 <option value="1">Yes</option>

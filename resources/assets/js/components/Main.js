@@ -33,7 +33,8 @@ export default class Main extends Component {
             token: localStorage["appState"]
                 ? JSON.parse(localStorage["appState"]).user.auth_token
                 : "",
-            resetTokenValid: false
+            resetTokenValid: false,
+            deleteConfirmModal: false
         }
 
         this.handlePageClick = this.handlePageClick.bind(this);
@@ -41,6 +42,7 @@ export default class Main extends Component {
         this.handleNextClick = this.handleNextClick.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
+        this.cancelDelete = this.cancelDelete.bind(this);
         this.renderNewProducts = this.renderNewProducts.bind(this);
         this.renderReviewForm = this.renderReviewForm.bind(this);
         this.handleAddProduct = this.handleAddProduct.bind(this);
@@ -166,18 +168,22 @@ export default class Main extends Component {
         if (currentPage > Math.ceil(products.length / productsPerPage)) {
             currentPage -= 1;
         }
+        
 
         const indexOfLastProduct = currentPage * productsPerPage;
         const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);   
+        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
         const renderProducts = currentProducts.map((product) => {
+
+            let productKey = `${product.id} (Product - All)`
+
             return (
                 <li
                     className="list-group-item"
                     style={listStyle}
                     onClick={() =>this.handleClick(product)} 
-                    key={product.title}
+                    key={productKey}
                 >
                     <h4 style={{ display: 'inline-block' }}>{product.title}</h4> 
                     <b style={{ float: 'right', marginRight: '5px' }}>
@@ -199,11 +205,12 @@ export default class Main extends Component {
         }
 
         const renderPageNumbers = pageNumbers.map(number => {
+            let listKey = `Page ${number} (All)`
 
             if (currentPage === number) {
                 return (
                     <li
-                        key={number}
+                        key={listKey}
                         id={number}
                         className="active"
                         onClick={this.handlePageClick}
@@ -304,8 +311,10 @@ export default class Main extends Component {
             var stars = [];
 
             for (var i = 0; i < star; i++) {
+                let starsKey = i + ' (new stars)'
+
                 stars.push(
-                <li key={i}>
+                <li key={starsKey}>
                     <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
                 </li>
                 );
@@ -319,7 +328,7 @@ export default class Main extends Component {
         products.sort((a, b) => (a.id - b.id));
 
         return products.reverse().slice(0, limit).map((product) => {
-            var newKey = `${product.title} (New)`;            
+            var newKey = `${product.id} (New)`;            
 
             return (
                 <li 
@@ -378,6 +387,10 @@ export default class Main extends Component {
         $('html, body').animate({
             scrollTop: $("#product").offset().top
         }, 1000);
+    }
+
+    cancelDelete() {        
+        this.setState({ deleteConfirmModal: false });
     }
 
     handleAddProduct(product) {
@@ -489,6 +502,8 @@ export default class Main extends Component {
     }
 
     handleDeleteProduct() {
+        this.setState({deleteConfirmModal: false});
+
         const currentProduct = this.state.currentProduct;
 
         fetch(`api/products/${currentProduct.id}?token=${this.state.token}`, {
@@ -503,10 +518,8 @@ export default class Main extends Component {
         });
     }
 
-    handleDeleteConfirm(event) {
-        if (confirm("Are you sure you want to delete it?")) {
-            this.handleDeleteProduct();
-        }
+    handleDeleteConfirm(event) {        
+        this.setState({deleteConfirmModal: true});
     }
 
     handleEdit() {
@@ -744,14 +757,20 @@ export default class Main extends Component {
         })
         .then(json => {            
             if (json.data.success) {
-                alert('Email Sent!');
+                $('#email-status').html(`
+                    <p class="text-success" style="margin-bottom: 5px">Email sent!</p>
+                    <p style="margin-bottom: 15px">You may have to check spam/junk folder.</p>
+                `);
             } else {
-                alert("Email could not send!");
-            } 
+                $('#email-status').html(`
+                    <p className="text-danger">Email could not send!</p>
+                    <p style="margin-bottom: 15px">Please try again or <a href="supprt@osreviews.tech">contact us</a>.</p>
+                `);
+            }
 
-            $("#login-form button")
+            $(".form-btn")
                 .removeAttr("disabled")
-                .html("Submit");
+                .html("Send Link");
         })
         .catch(errors => {
             $(".form-btn")
@@ -792,10 +811,7 @@ export default class Main extends Component {
             object[key] = value;
         });
         
-        var jsonData = JSON.stringify(object);
-
-        console.log(jsonData);
-        
+        var jsonData = JSON.stringify(object);        
 
         axios({
             method:'post',
@@ -880,10 +896,7 @@ export default class Main extends Component {
         .then(response => {
             return response;
         })
-        .then(json => {
-            console.log('JSON:');
-            console.log(json);
-            
+        .then(json => {            
             if (json.data[0].success) {
                 let userData = {
                     name: json.data[0].data.name,
@@ -893,9 +906,6 @@ export default class Main extends Component {
                     token_expire: json.data[0].data.token_expire,
                     timestamp: new Date().toString()
                 };
-
-                console.log('userData:');
-                console.log(userData);
 
                 let appState = {
                     isLoggedIn: true,
@@ -1018,6 +1028,28 @@ export default class Main extends Component {
                         OS Reviews <i className="fa fa-laptop" aria-hidden="true"></i>
                     </h1>
                 </nav>
+                
+                { this.state.deleteConfirmModal ? (
+                    <div id="delete-modal" className="modal fade in" role="dialog">
+                        <div className="modal-dialog modal-sm">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                <h3 className="modal-title text-center">Are you sure?</h3>
+                                </div>
+                                <div className="modal-body center-block">
+                                    <button type="button" className="btn btn-danger center-block" onClick={e => this.handleDeleteProduct()}>
+                                        Delete Review
+                                    </button>
+                                    <button type="button" className="btn btn-default center-block" style={{ marginLeft: 'auto', marginTop: '10px' }} onClick={e => this.cancelDelete()}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div/>
+                ) }
 
                 <p id="session-expired"></p>
 
@@ -1035,6 +1067,7 @@ export default class Main extends Component {
                                     handleEdit = {this.handleEdit}
                                     token = {this.state.token}
                                     user = {this.state.user}
+                                    deleteConfirmModal = {this.state.deleteConfirmModal}
                                 />
                             </div>
                         </div>

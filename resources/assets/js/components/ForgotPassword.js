@@ -9,7 +9,7 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
     forgotPassword(_email.value);
   };
 
-  const inputStyle = { width: '75%', marginBottom: '20px' }
+  const inputStyle = { width: '75%', marginBottom: '20px', marginTop: '5px' }
 
   return (
     <div id="main">
@@ -24,11 +24,13 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
           <div className="panel-body">
             { window.location.search === '?token=invalid' ? (
               <div>
-                <p className="text-danger">Token has expired.</p>
+                <p className="text-danger">Reset link has expired.</p>
               </div>
             ) : (
               <div/>
             ) }
+
+            <div id="email-status"></div>
 
             <div className="form-group email-error">
               <input ref={input => (_email = input)} autoComplete="off" id="email-input" name="email" type="email"  className="form-control center-block" placeholder="Email" style={inputStyle}/>
@@ -36,12 +38,12 @@ const ForgotPassword = ({ history, forgotPassword = f => f }) => {
 
             <ul className="form-errors text-danger center-block" style={{ listStyle: 'none' }}></ul>
 
-            <button type="submit" className="btn btn-primary center-block forgot-password-btn form-btn" style={{ margin: '20px auto 10px' }} href="#!">
+            <button type="submit" className="btn btn-primary center-block forgot-password-btn form-btn mobile-btn" style={{ margin: '20px auto 15px' }} href="#!">
               Send Link
             </button>
 
             <Link to="/" style={{ color: '#636b6f' }}>
-              <button className="btn btn-default">Cancel</button>
+              <button className="btn btn-default mobile-btn">Cancel</button>
             </Link>
           </div>
         </form>
