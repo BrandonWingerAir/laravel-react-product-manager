@@ -21,15 +21,35 @@ const Product = props => {
     minHeight: '100vh'
   }
 
-  const reviewStars = (star) => {
-    star = Math.round(star);
-    
+  const reviewStars = (star) => {    
     var stars = [];
 
-    for (var i = 0; i < star; i++) {
+    if (star < Math.round(star)) {
+      for (var i = 1; i < star; i++) {
+          let starsKey = i + ' (item stars)';
+
+          stars.push(
+              <li key={starsKey}>
+                  <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+              </li>
+          );
+      }
+
       stars.push(
-        <li key={i}><span className="fa fa-star" aria-hidden="true" style={{ color: '#fdd835' }}></span></li>
+        <li key='item half star'>
+            <span className="fa fa-star-half" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+        </li>
       );
+    } else {
+      for (var i = 0; i < Math.round(star); i++) {
+        let starsKey = i + ' (item stars)';
+
+        stars.push(
+            <li key={starsKey}>
+                <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+            </li>
+        );
+      }
     }
 
     return stars;
@@ -118,7 +138,7 @@ const Product = props => {
           {(reviewStars(product.rating))}
         </ul>
 
-        <h3 style={{ marginTop: '5px' }}>Rating: {product.rating}/5</h3>
+        <h3 style={{ marginTop: '5px' }}>Rating: {parseFloat(product.rating)}/5</h3>
 
         <hr style={{ width: '40%' }}/>
 

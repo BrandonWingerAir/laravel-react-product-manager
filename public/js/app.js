@@ -44592,7 +44592,6 @@ var Main = function (_Component) {
             var currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
             var renderProducts = currentProducts.map(function (product) {
-
                 var productKey = product.id + ' (Product - All)';
 
                 return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -44771,14 +44770,32 @@ var Main = function (_Component) {
             var reviewStars = function reviewStars(star) {
                 var stars = [];
 
-                for (var i = 0; i < star; i++) {
-                    var starsKey = i + ' (new stars)';
+                if (star < Math.round(star)) {
+                    for (var i = 1; i < star; i++) {
+                        var starsKey = i + ' (item stars)';
+
+                        stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'li',
+                            { key: starsKey },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+                        ));
+                    }
 
                     stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'li',
-                        { key: starsKey },
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+                        { key: 'item half star' },
+                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star-half', 'aria-hidden': 'true', style: { color: '#3097D1' } })
                     ));
+                } else {
+                    for (var i = 0; i < Math.round(star); i++) {
+                        var _starsKey = i + ' (item stars)';
+
+                        stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                            'li',
+                            { key: _starsKey },
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+                        ));
+                    }
                 }
 
                 return stars;
@@ -59002,16 +59019,34 @@ var Product = function Product(props) {
   };
 
   var reviewStars = function reviewStars(star) {
-    star = Math.round(star);
-
     var stars = [];
 
-    for (var i = 0; i < star; i++) {
+    if (star < Math.round(star)) {
+      for (var i = 1; i < star; i++) {
+        var starsKey = i + ' (item stars)';
+
+        stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'li',
+          { key: starsKey },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+        ));
+      }
+
       stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'li',
-        { key: i },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#fdd835' } })
+        { key: 'item half star' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star-half', 'aria-hidden': 'true', style: { color: '#3097D1' } })
       ));
+    } else {
+      for (var i = 0; i < Math.round(star); i++) {
+        var _starsKey = i + ' (item stars)';
+
+        stars.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'li',
+          { key: _starsKey },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-star', 'aria-hidden': 'true', style: { color: '#3097D1' } })
+        ));
+      }
     }
 
     return stars;
@@ -59129,7 +59164,7 @@ var Product = function Product(props) {
         'h3',
         { style: { marginTop: '5px' } },
         'Rating: ',
-        product.rating,
+        parseFloat(product.rating),
         '/5'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', { style: { width: '40%' } }),

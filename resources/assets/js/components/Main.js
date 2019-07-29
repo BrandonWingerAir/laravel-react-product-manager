@@ -168,14 +168,12 @@ export default class Main extends Component {
         if (currentPage > Math.ceil(products.length / productsPerPage)) {
             currentPage -= 1;
         }
-        
 
         const indexOfLastProduct = currentPage * productsPerPage;
         const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
         const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
         const renderProducts = currentProducts.map((product) => {
-
             let productKey = `${product.id} (Product - All)`
 
             return (
@@ -310,14 +308,32 @@ export default class Main extends Component {
         const reviewStars = (star) => {
             var stars = [];
 
-            for (var i = 0; i < star; i++) {
-                let starsKey = i + ' (new stars)'
+            if (star < Math.round(star)) {
+                for (var i = 1; i < star; i++) {
+                    let starsKey = i + ' (item stars)';
+
+                    stars.push(
+                        <li key={starsKey}>
+                            <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+                        </li>
+                    );
+                }
 
                 stars.push(
-                <li key={starsKey}>
-                    <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
-                </li>
+                    <li key='item half star'>
+                        <span className="fa fa-star-half" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+                    </li>
                 );
+            } else {
+                for (var i = 0; i < Math.round(star); i++) {
+                    let starsKey = i + ' (item stars)';
+
+                    stars.push(
+                        <li key={starsKey}>
+                            <span className="fa fa-star" aria-hidden="true" style={{ color: '#3097D1' }}></span>
+                        </li>
+                    );
+                }
             }
         
             return stars;
@@ -1216,7 +1232,7 @@ if (document.getElementById('root')) {
     ReactDOM.render(
         <BrowserRouter>
             <AppContainer/>
-        </BrowserRouter>, 
+        </BrowserRouter>,
 
         document.getElementById('root')
     );
